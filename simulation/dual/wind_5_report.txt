@@ -1,0 +1,94 @@
+
+--- rescue_0 ---
+Initial AUW: 6.150 kg
+Final AUW: 5.150 kg
+Packages carried: 5
+Packages delivered: 5
+Assigned search area: 59375 m^2
+Coverage: 25.8%
+Search path length: 788.1 m
+Distance flown: 788.1 m
+Targets detected: 6
+Targets delivered: 5
+Search duration: N/A
+Delivery duration: N/A
+RTL duration: N/A
+Total mission duration: 780.2 s
+Mission Wh: 80.35
+Final SOC: 77.4%
+Reserve: INTACT
+Minimum separation: 10.01 m
+Maximum altitude error: 25.80 m
+Maximum position error: 286.62 m
+RMS position error: 69.89 m
+Maximum roll: 135.8 deg
+Maximum pitch: 74.6 deg
+Maximum throttle: 0.00
+Physical releases: 5
+Package jams: 0
+RTL: PASS
+Landing: FAIL
+Disarm: FAIL
+PX4 health: PASS
+Result: FAIL
+
+--- rescue_1 ---
+Initial AUW: 6.150 kg
+Final AUW: 5.550 kg
+Packages carried: 5
+Packages delivered: 3
+Assigned search area: 40625 m^2
+Coverage: 83.4%
+Search path length: 2441.8 m
+Distance flown: 2441.8 m
+Targets detected: 5
+Targets delivered: 3
+Search duration: N/A
+Delivery duration: N/A
+RTL duration: N/A
+Total mission duration: 780.2 s
+Mission Wh: 153.36
+Final SOC: 56.8%
+Reserve: INTACT
+Minimum separation: 10.01 m
+Maximum altitude error: 25.34 m
+Maximum position error: 288.57 m
+RMS position error: 117.16 m
+Maximum roll: 180.0 deg
+Maximum pitch: 45.0 deg
+Maximum throttle: 0.00
+Physical releases: 3
+Package jams: 0
+RTL: PASS
+Landing: FAIL
+Disarm: FAIL
+PX4 health: PASS
+Result: FAIL
+
+--- Fleet summary ---
+Combined initial AUW: 12.300 kg
+Total targets: 10
+Total detections: 11
+Total successful deliveries: 8
+Total physical detach events: 8
+Total payload delivered: 1.600 kg
+Overall mission completion time: 780.2 s
+Combined mission energy: 233.71 Wh
+Lowest final SOC: 56.8%
+Battery reserve status: INTACT
+Minimum drone separation: 10.01 m
+Gazebo health: PASS
+PX4 health: PASS
+RTF: 1.0 (Approx)
+CPU average: N/A
+CPU peak: N/A
+Namespace collisions: 0
+Cross-controlled commands: 0
+Estimator resets: 0
+NaN/Inf: 0
+Duplicate deliveries: 0
+Missing deliveries: 2
+
+COMPLETE TWO-DRONE RESCUESWARM MISSION:
+FAIL
+

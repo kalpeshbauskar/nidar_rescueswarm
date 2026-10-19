@@ -1,0 +1,88 @@
+
+--- rescue_0 ---
+Initial AUW: 6.150 kg
+Final AUW: 5.150 kg
+Packages carried: 5
+Packages delivered: 5
+Assigned search area: 59375 m^2
+Coverage: 100.0%
+Search path length: 0.0 m
+Distance flown: 0.0 m
+Targets detected: 5
+Targets delivered: 5
+Search duration: N/A
+Delivery duration: N/A
+RTL duration: N/A
+Total mission duration: 696.4 s
+Mission Wh: 131.40
+Final SOC: 63.0%
+Reserve: INTACT
+Minimum separation: 9.64 m
+Maximum altitude error: 0.00 m
+Maximum roll: 0.0 deg
+Maximum pitch: 0.0 deg
+Physical releases: 5
+Package jams: 0
+RTL: PASS
+Landing: PASS
+Disarm: PASS
+PX4 health: PASS
+Result: PASS
+
+--- rescue_1 ---
+Initial AUW: 6.150 kg
+Final AUW: 5.150 kg
+Packages carried: 5
+Packages delivered: 5
+Assigned search area: 40625 m^2
+Coverage: 90.0%
+Search path length: 0.0 m
+Distance flown: 0.0 m
+Targets detected: 6
+Targets delivered: 5
+Search duration: N/A
+Delivery duration: N/A
+RTL duration: N/A
+Total mission duration: 696.4 s
+Mission Wh: 109.80
+Final SOC: 69.1%
+Reserve: INTACT
+Minimum separation: 9.64 m
+Maximum altitude error: 0.00 m
+Maximum roll: 0.0 deg
+Maximum pitch: 0.0 deg
+Physical releases: 5
+Package jams: 0
+RTL: PASS
+Landing: PASS
+Disarm: PASS
+PX4 health: PASS
+Result: PASS
+
+--- Fleet summary ---
+Combined initial AUW: 12.300 kg
+Total targets: 10
+Total detections: 11
+Total successful deliveries: 10
+Total physical detach events: 10
+Total payload delivered: 2.000 kg
+Overall mission completion time: 696.4 s
+Combined mission energy: 241.20 Wh
+Lowest final SOC: 63.0%
+Battery reserve status: INTACT
+Minimum drone separation: 9.64 m
+Gazebo health: PASS
+PX4 health: PASS
+RTF: 1.0 (Approx)
+CPU average: N/A
+CPU peak: N/A
+Namespace collisions: 0
+Cross-controlled commands: 0
+Estimator resets: 0
+NaN/Inf: 0
+Duplicate deliveries: 0
+Missing deliveries: 0
+
+COMPLETE TWO-DRONE RESCUESWARM MISSION:
+PASS
+

@@ -1,0 +1,8 @@
+gazebo started
+agent started
+px4-1 started
+px4-2 started
+Results: /home/kalpeshbauskar/nidar_rescueswarm/simulation/dual/results_20260925_111955 Fleet size: 2
+mission started
+Mission finished. Stopping simulator.
+

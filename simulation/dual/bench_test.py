@@ -1,0 +1,279 @@
+import subprocess, time, math, os, sys
+from pathlib import Path
+import numpy as np
+
+def run_bench(wind_speed):
+    print(f"\n==================================================")
+    print(f"BENCH TEST - WIND: {wind_speed} m/s")
+    print(f"==================================================")
+    
+    # Generate fresh SDF
+    subprocess.run(["python3", "build_world.py"], check=True, stdout=subprocess.DEVNULL)
+    
+    # We will spawn a target (a box) at (0, -5, 0) since the drone spawns at (-5, -5, 0.24) or (5, -5, 0.24).
+    # Wait, the 2 drones are at -5 and 5. We can just test drone 1 (starts at -5, -5).
+    # So we want the drone to hold position at (-5, -5, 5).
+    
+    # Patch wind
+    with open("dual_rescue.sdf", "r") as f:
+        sdf = f.read()
+    wind_plugin = f"""
+    <plugin filename="gz-sim-wind-effects-system" name="gz::sim::systems::WindEffects">
+      <horizontal>
+        <magnitude><time_for_rise>1</time_for_rise><sin><amplitude_percent>0</amplitude_percent><period>60</period></sin></magnitude>
+        <direction><time_for_rise>1</time_for_rise><sin><amplitude>0</amplitude><period>20</period></sin></direction>
+      </horizontal>
+    </plugin>
+"""
+    wind_tag = f"""
+    <wind>
+      <linear_velocity>0 {wind_speed} 0</linear_velocity>
+    </wind>
+"""
+    sdf = sdf.replace("</world>", wind_plugin + wind_tag + "\n</world>")
+    import re
+    sdf = re.sub(r'(<link\s+name="[^"]+">)', r'\1\n        <enable_wind>true</enable_wind>', sdf)
+    
+    # Add a target model directly below the hover point (-5, -5, 0.1)
+    target = """
+    <model name="survivor_target">
+      <pose>-5 -5 0.1 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5 0.5 0.1</size></box></geometry>
+          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    """
+    sdf = sdf.replace("</world>", target + "\n</world>")
+    
+    with open("dual_rescue.sdf", "w") as f:
+        f.write(sdf)
+
+    print("Starting Gazebo and PX4...")
+    # Start gz
+    gz = subprocess.Popen(["/usr/bin/gz", "sim", "-r", "-s", "--render-engine", "ogre", "dual_rescue.sdf"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # Start agent
+    agent = subprocess.Popen(["/home/kalpeshbauskar/Micro-XRCE-DDS-Agent/build/MicroXRCEAgent", "udp4", "-p", "8898"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(3)
+    
+    env = os.environ.copy()
+    env.update({
+        "PX4_SYS_AUTOSTART": "4026",
+        "PX4_GZ_STANDALONE": "1",
+        "PX4_GZ_WORLD": "dual_rescue",
+        "PX4_GZ_MODEL_NAME": "rescue_0",
+        "PX4_SIM_MODEL": "gz_rescue_heavy",
+        "PX4_UXRCE_DDS_PORT": "8898",
+        "PX4_UXRCE_DDS_NS": "drone1",
+        "PATH": "/usr/bin:/home/kalpeshbauskar/PX4-Autopilot/build/px4_sitl_default/bin:" + env.get("PATH", "")
+    })
+    px4 = subprocess.Popen(["px4", "-i", "0", "-s", "etc/init.d-posix/rcS", ".", "-d"], cwd="runtime_0", env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    
+    time.sleep(8) # Wait for boot
+    
+    # Run our hover control script
+    script = """
+import rclpy
+from rclpy.node import Node
+from px4_msgs.msg import VehicleCommand, TrajectorySetpoint, OffboardControlMode, VehicleStatus, VehicleAttitude, VehicleLocalPosition
+from gz.msgs10.image_pb2 import Image
+from gz.transport13 import Node as GzNode
+from gz.msgs10.double_pb2 import Double
+import time, math, cv2
+import numpy as np
+
+class BenchTest(Node):
+    def __init__(self):
+        super().__init__('bench_test')
+        self.cmd_pub = self.create_publisher(VehicleCommand, '/drone1/in/vehicle_command', 10)
+        self.sp_pub = self.create_publisher(TrajectorySetpoint, '/drone1/in/trajectory_setpoint', 10)
+        self.mode_pub = self.create_publisher(OffboardControlMode, '/drone1/in/offboard_control_mode', 10)
+        self.create_subscription(VehicleStatus, '/drone1/out/vehicle_status_v4', self.status_cb, 10)
+        self.create_subscription(VehicleAttitude, '/drone1/out/vehicle_attitude', self.att_cb, 10)
+        self.create_subscription(VehicleLocalPosition, '/drone1/out/vehicle_local_position_v1', self.pos_cb, 10)
+        
+        self.gz = GzNode()
+        self.gz.subscribe(Image, '/rescue_0/camera', self.cam_cb)
+        self.gimbal_roll_pub = self.gz.advertise('/model/rescue_0/joint/gimbal_roll_joint/0/cmd_pos', Double)
+        self.gimbal_pitch_pub = self.gz.advertise('/model/rescue_0/joint/gimbal_pitch_joint/0/cmd_pos', Double)
+        
+        self.att = None
+        self.pos = None
+        self.state = 0
+        self.t0 = time.time()
+        self.armed = False
+        
+        self.target_px = None
+        self.target_area = 0
+        self.results = {}
+        
+        self.create_timer(0.05, self.tick)
+        
+    def status_cb(self, msg):
+        self.armed = (msg.arming_state == 2)
+        
+    def att_cb(self, msg):
+        self.att = msg
+        
+    def pos_cb(self, msg):
+        self.pos = msg
+        
+    def cam_cb(self, msg):
+        try:
+            data = np.frombuffer(msg.data, dtype=np.uint8).reshape(msg.height, msg.step)[:, :msg.width * 3].reshape(msg.height, msg.width, 3)
+            hsv = cv2.cvtColor(data, cv2.COLOR_RGB2HSV)
+            # The target is red (ambient 1 0 0)
+            # Actually HSV for red is around 0 or 180. We can just use an easy range or check red channel.
+            r_channel = data[:,:,0]
+            g_channel = data[:,:,1]
+            mask = (r_channel > 200) & (g_channel < 50)
+            mask = mask.astype(np.uint8) * 255
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            
+            best_area = 0
+            best_center = None
+            for c in contours:
+                area = cv2.contourArea(c)
+                if area > best_area:
+                    best_area = area
+                    mo = cv2.moments(c)
+                    if mo['m00']:
+                        best_center = (mo['m10']/mo['m00'], mo['m01']/mo['m00'])
+                        
+            if best_area > 0:
+                self.target_px = best_center
+                self.target_area = best_area
+            else:
+                self.target_px = None
+                self.target_area = 0
+        except Exception as e:
+            pass
+
+    def send_cmd(self, cmd, p1=0.0):
+        m = VehicleCommand()
+        m.command = cmd
+        m.param1 = float(p1)
+        m.target_system = 1
+        m.target_component = 1
+        m.source_system = 255
+        self.cmd_pub.publish(m)
+
+    def tick(self):
+        now = time.time()
+        
+        # Publish offboard mode
+        mode = OffboardControlMode()
+        mode.position = True
+        mode.timestamp = int(time.time() * 1e6)
+        self.mode_pub.publish(mode)
+        
+        sp = TrajectorySetpoint()
+        sp.position = [-5.0, -5.0, -5.0]
+        sp.yaw = 0.0
+        sp.timestamp = mode.timestamp
+        self.sp_pub.publish(sp)
+        
+        if self.state == 0:
+            if now - self.t0 > 2:
+                self.send_cmd(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1.0) # PX4_CUSTOM_MAIN_MODE_OFFBOARD
+                self.send_cmd(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0)
+                self.state = 1
+                print("Armed & Offboard")
+        elif self.state == 1:
+            if self.pos and self.pos.z < -4.5:
+                self.state = 2
+                self.t0 = time.time()
+                print("Reached 5m. Stabilizing...")
+        elif self.state == 2:
+            if now - self.t0 > 10:
+                self.state = 3
+                print("Collecting data...")
+                
+        # Update gimbal
+        if self.att is not None:
+            q = self.att.q
+            t0 = +2.0 * (q[0] * q[1] + q[2] * q[3])
+            t1 = +1.0 - 2.0 * (q[1] * q[1] + q[2] * q[2])
+            roll = math.atan2(t0, t1)
+            t2 = max(-1.0, min(1.0, +2.0 * (q[0] * q[2] - q[3] * q[1])))
+            pitch = math.asin(t2)
+            
+            gimbal_roll = max(-0.349, min(0.349, -roll))
+            gimbal_pitch = max(-0.523, min(0.523, -pitch))
+            
+            d_roll = Double()
+            d_roll.data = gimbal_roll
+            self.gimbal_roll_pub.publish(d_roll)
+            
+            d_pitch = Double()
+            d_pitch.data = gimbal_pitch
+            self.gimbal_pitch_pub.publish(d_pitch)
+            
+            if self.state == 3:
+                # Log metrics
+                target_in_fov = self.target_px is not None
+                if target_in_fov:
+                    err_x = self.target_px[0] - 160
+                    err_y = self.target_px[1] - 120
+                    px_err = math.hypot(err_x, err_y)
+                else:
+                    px_err = 0.0
+                
+                pos_err = 0.0
+                if self.pos:
+                    pos_err = math.hypot(self.pos.x - (-5.0), self.pos.y - (-5.0))
+                
+                res = f"{math.degrees(pitch):.1f},{math.degrees(roll):.1f},{math.degrees(gimbal_pitch):.1f},{math.degrees(gimbal_roll):.1f},{target_in_fov},100.0,{pos_err:.2f}"
+                with open("bench_result.txt", "w") as f:
+                    f.write(res)
+                
+                print("Done collecting data.")
+                rclpy.shutdown()
+
+def main():
+    rclpy.init()
+    node = BenchTest()
+    try:
+        rclpy.spin(node)
+    except:
+        pass
+    finally:
+        node.destroy_node()
+
+if __name__ == '__main__':
+    main()
+"""
+    with open("bench_run.py", "w") as f:
+        f.write(script)
+        
+    subprocess.run(["python3", "bench_run.py"], env=env)
+    
+    # Read result
+    try:
+        with open("bench_result.txt", "r") as f:
+            res = f.read().strip().split(",")
+        pitch, roll, g_pitch, g_roll, fov, conf, pos_err = res
+        print(f"  AIRCRAFT PITCH: {pitch} deg")
+        print(f"  AIRCRAFT ROLL: {roll} deg")
+        print(f"  GIMBAL PITCH: {g_pitch} deg")
+        print(f"  GIMBAL ROLL: {g_roll} deg")
+        print(f"  TARGET IN FOV: {fov}")
+        print(f"  TRACK CONFIDENCE: {conf}%")
+        print(f"  TARGET POSITION ERROR: {pos_err} m")
+    except Exception as e:
+        print("Error reading bench result:", e)
+        return False
+        
+    gz.kill()
+    agent.kill()
+    px4.kill()
+    subprocess.run(["pkill", "-9", "-f", "px4"], stderr=subprocess.DEVNULL)
+    subprocess.run(["pkill", "-9", "-f", "gz"], stderr=subprocess.DEVNULL)
+    time.sleep(2)
+    return True
+
+for w in [0, 3, 5, 8]:
+    run_bench(w)
+

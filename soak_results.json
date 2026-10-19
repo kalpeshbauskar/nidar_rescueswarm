@@ -1,0 +1,47 @@
+[
+  {
+    "cycle": 1,
+    "wind": 0,
+    "success": false,
+    "duration": 264.9004690647125,
+    "mem_start": 404905984,
+    "mem_end": 0,
+    "max_cpu": 0,
+    "arms": 0,
+    "rtls": 0,
+    "lands": 0,
+    "disarms": 0,
+    "drops": 0,
+    "res_dir": "/home/kalpeshbauskar/nidar_rescueswarm/simulation/dual/results_20260926_125857"
+  },
+  {
+    "cycle": 2,
+    "wind": 5.0,
+    "success": false,
+    "duration": 1155.707676410675,
+    "mem_start": 405692416,
+    "mem_end": 585240576,
+    "max_cpu": 0,
+    "arms": 2,
+    "rtls": 0,
+    "lands": 2,
+    "disarms": 0,
+    "drops": 0,
+    "res_dir": "/home/kalpeshbauskar/nidar_rescueswarm/simulation/dual/results_20260926_130134"
+  },
+  {
+    "cycle": 3,
+    "wind": 0,
+    "success": false,
+    "duration": 1350.4251022338867,
+    "mem_start": 405565440,
+    "mem_end": 884285440,
+    "max_cpu": 0,
+    "arms": 2,
+    "rtls": 0,
+    "lands": 2,
+    "disarms": 0,
+    "drops": 0,
+    "res_dir": "/home/kalpeshbauskar/nidar_rescueswarm/simulation/dual/results_20260926_130559"
+  }
+]

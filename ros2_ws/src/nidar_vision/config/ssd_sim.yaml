@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    confidence_threshold: 0.25
+    iou_threshold: 0.45
+    device: 'auto'
+    image_topic: '/nidar/camera/image_raw'
+    annotated_image_topic: '/nidar/ssd/image_annotated'
+    detections_topic: '/nidar/ssd/detections'
+    
+    # Simulation parameters for reliable overhead survivor detection
+    simulation_mode: true
+    vision_release_enabled: true
+    min_consecutive_frames: 2
+    min_confidence: 0.25
+    max_detection_age_sec: 4.0
+    min_box_area_px: 8
+    max_box_area_px: 50000

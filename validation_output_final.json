@@ -1,0 +1,221 @@
+{
+  "success": true,
+  "hardware_validation": {
+    "all_passed": true,
+    "checks": {
+      "fleet_2_drones": {
+        "passed": true,
+        "details": "Fleet size = 2 drones"
+      },
+      "exactly_10_packages": {
+        "passed": true,
+        "details": "Total packages = 10"
+      },
+      "package_mass_0_200kg": {
+        "passed": true,
+        "details": "Package mass = 0.200 kg"
+      },
+      "allocation_5_5": {
+        "passed": true,
+        "details": "Allocation = list((5, 5))"
+      },
+      "all_packages_onboard_initially": {
+        "passed": true,
+        "details": "Initial onboard distribution: Drone 1=5, Drone 2=5"
+      },
+      "combined_auw_under_25kg": {
+        "passed": true,
+        "details": "Fleet AUW = 12.560 kg <= 25.0 kg (D1: 6.280kg, D2: 6.280kg)"
+      },
+      "each_drone_tw_ge_1_5": {
+        "passed": true,
+        "details": "Drone 1: full T/W=1.66, empty T/W=1.97; Drone 2: full T/W=1.66, empty T/W=1.97"
+      },
+      "mission_le_30min_rule": {
+        "passed": true,
+        "details": "Maximum allowed mission time = 30.0 minutes (1800s)"
+      },
+      "usable_battery_sufficient": {
+        "passed": true,
+        "details": "Drone 1 (553.0s): 107.5 Wh (69.7% SOC, reserve intact: True); Drone 2 (553.0s): 110.6 Wh (68.9% SOC, reserve intact: True)"
+      },
+      "reserve_remains_intact": {
+        "passed": true,
+        "details": "20% hard reserve (71.04 Wh) remains untouched across all flight profiles"
+      },
+      "esc_current_limits_valid": {
+        "passed": true,
+        "details": "Motor current 8.4A <= 40A continuous ESC rating (Tested max: 17.0A)"
+      },
+      "electrical_assumptions_valid": {
+        "passed": true,
+        "details": "PDB: True (120.0A), Battery 25C: True (300A), XT90-S: True (90.0A), 10 AWG wire: True (140.0A)"
+      },
+      "offline_operation_works": {
+        "passed": true,
+        "details": "Private static IPs ['10.42.0.11', '10.42.0.12', '10.42.0.13'], zero external Internet/LTE/Cloud dependencies"
+      },
+      "package_release_updates_mass": {
+        "passed": true,
+        "details": "4 pkgs: 6.080kg -> 3 pkgs: 5.880kg -> 2 pkgs: 5.680kg -> 1 pkgs: 5.480kg -> 0 pkgs: 5.280kg"
+      },
+      "network_failsafes_work": {
+        "passed": true,
+        "details": "Wi-Fi lost: degrade video on RFD; RFD lost: backup on Wi-Fi; Both lost + nav OK: RTL; Both lost + nav invalid: safe hold/land; Restored: normal operation"
+      }
+    }
+  },
+  "target_competition_fleet": {
+    "fleet_size": 2,
+    "total_packages": 10,
+    "package_allocation": [
+      5,
+      5
+    ],
+    "combined_fleet_auw_kg": 12.56,
+    "max_fleet_auw_limit_kg": 25.0,
+    "max_mission_duration_sec": 1800.0,
+    "battery_nominal_wh": 355.2,
+    "battery_usable_wh": 284.16,
+    "battery_reserve_wh": 71.04,
+    "motor": "T-Motor MN4014 KV330",
+    "propeller": "17x5.8 Carbon Fiber",
+    "network": {
+      "rfd868x": "868 MHz Critical Telemetry",
+      "wifi": "5 GHz Private Local WPA3 LAN",
+      "static_ips": {
+        "1": "10.42.0.11",
+        "2": "10.42.0.12",
+        "3": "10.42.0.13"
+      }
+    }
+  },
+  "mission_delivery_metrics": {
+    "survivors_total": 10,
+    "survivors_detected": 1,
+    "survivors_delivered": 10,
+    "minimum_drone_separation_m": 9.090048837677376,
+    "deliveries": [
+      {
+        "drone": 1,
+        "parcel": "parcel_0_0",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_1",
+        "landing_north": -122.39987736571655,
+        "landing_east": -120.53478576645334,
+        "landing_height": 0.03999980148235837,
+        "distance_m": 22.4062603264164,
+        "verified": false,
+        "target_estimation_error_m": 22.928278537167504
+      },
+      {
+        "drone": 1,
+        "parcel": "parcel_0_1",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_1",
+        "landing_north": -116.28770879795215,
+        "landing_east": -118.445409154732,
+        "landing_height": 0.029999756267649894,
+        "distance_m": 16.361730060818108,
+        "verified": false,
+        "target_estimation_error_m": 17.013590442599426
+      },
+      {
+        "drone": 1,
+        "parcel": "parcel_0_2",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_1",
+        "landing_north": -128.00889157174973,
+        "landing_east": -120.12980576333318,
+        "landing_height": 0.03999979617539861,
+        "distance_m": 28.00919235919214,
+        "verified": false,
+        "target_estimation_error_m": 27.21542780763819
+      },
+      {
+        "drone": 1,
+        "parcel": "parcel_0_3",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_6",
+        "landing_north": 31.640584257941153,
+        "landing_east": -143.24849227725176,
+        "landing_height": 0.039999851095192815,
+        "distance_m": 10.745356582213102,
+        "verified": false,
+        "target_estimation_error_m": 8.802787035870676
+      },
+      {
+        "drone": 1,
+        "parcel": "parcel_0_4",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_6",
+        "landing_north": 53.77271706755161,
+        "landing_east": -148.86460136582465,
+        "landing_height": 0.03999980612936152,
+        "distance_m": 13.819437958228065,
+        "verified": false,
+        "target_estimation_error_m": 14.563192401068184
+      },
+      {
+        "drone": 2,
+        "parcel": "parcel_1_0",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_5",
+        "landing_north": 0.28357490185076284,
+        "landing_east": 41.65180799864355,
+        "landing_height": 0.02999980214234526,
+        "distance_m": 39.75075964357514,
+        "verified": false,
+        "target_estimation_error_m": 39.790498788425445
+      },
+      {
+        "drone": 2,
+        "parcel": "parcel_1_1",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_5",
+        "landing_north": 12.327443193382772,
+        "landing_east": 38.858744497199986,
+        "landing_height": 0.03999983556468203,
+        "distance_m": 27.696080306392254,
+        "verified": false,
+        "target_estimation_error_m": 26.991844317848265
+      },
+      {
+        "drone": 2,
+        "parcel": "parcel_1_2",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_5",
+        "landing_north": 22.960681636536478,
+        "landing_east": 41.623841432322514,
+        "landing_height": 0.039999848431191774,
+        "distance_m": 17.116519251553232,
+        "verified": false,
+        "target_estimation_error_m": 16.71840582394414
+      },
+      {
+        "drone": 2,
+        "parcel": "parcel_1_3",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_5",
+        "landing_north": 0.3918950716430945,
+        "landing_east": 58.39637376675928,
+        "landing_height": 0.03999980727539467,
+        "distance_m": 43.671827804455816,
+        "verified": false,
+        "target_estimation_error_m": 42.97434428357601
+      },
+      {
+        "drone": 2,
+        "parcel": "parcel_1_4",
+        "package_mass_kg": 0.2,
+        "nearest_survivor": "survivor_5",
+        "landing_north": 4.600878294299097,
+        "landing_east": 50.801031502970616,
+        "landing_height": 0.03999980567247958,
+        "distance_m": 37.01027018360159,
+        "verified": false,
+        "target_estimation_error_m": 35.38960620332291
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "active_profile": "competition_2drone",
+  "area_m2": 100000,
+  "altitude_m": 25,
+  "lane_spacing_m": 20,
+  "package_mass_kg": 0.2,
+  "world_origin": [
+    47.397971057728974,
+    8.546163739800146,
+    0
+  ],
+  "profiles": {
+    "competition_2drone": {
+      "fleet_size": 2,
+      "packages_total": 10,
+      "package_allocation": [
+        5,
+        5
+      ],
+      "max_fleet_auw_kg": 12.3,
+      "max_mission_time_sec": 1800,
+      "drones": [
+        {
+          "id": 0,
+          "drone_num": 1,
+          "packages": 5,
+          "model_name": "rescue_0",
+          "ip": "10.42.0.11",
+          "port_ns": "drone1",
+          "east_start": -5
+        },
+        {
+          "id": 1,
+          "drone_num": 2,
+          "packages": 5,
+          "model_name": "rescue_1",
+          "ip": "10.42.0.12",
+          "port_ns": "drone2",
+          "east_start": 5
+        }
+      ],
+      "zones": [
+        {
+          "id": 0,
+          "east_min": -160,
+          "east_max": 30,
+          "north_min": -156.25,
+          "north_max": 156.25,
+          "area_m2": 59375
+        },
+        {
+          "id": 1,
+          "east_min": 30,
+          "east_max": 160,
+          "north_min": -156.25,
+          "north_max": 156.25,
+          "area_m2": 40625
+        }
+      ]
+    }
+  },
+  "zones": [
+    {
+      "id": 0,
+      "east_min": -160,
+      "east_max": 30,
+      "north_min": -156.25,
+      "north_max": 156.25,
+      "area_m2": 59375
+    },
+    {
+      "id": 1,
+      "east_min": 30,
+      "east_max": 160,
+      "north_min": -156.25,
+      "north_max": 156.25,
+      "area_m2": 40625
+    }
+  ]
+}

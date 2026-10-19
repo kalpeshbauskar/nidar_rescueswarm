@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environment
+venv/
+env/
+.env
+
+# Pytest & test cache
+.pytest_cache/
+
+# ROS 2 build & install artifacts
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Simulation runtime, generated logs & telemetry
+simulation/dual/runtime_*/
+simulation/dual/results_*/
+simulation/dual/latest_run/
+simulation/dual/*.log
+simulation/logs/
+simulation/etc/dual/runtime_*/
+*.log
+*.ulg
+
+# Video recordings & archives
+simulation/recordings/
+*.mp4
+*.zip
+*.tar
+*.gz
+
+# Third-party submodules & large raw training datasets
+px4_import/
+datasets/coco_raw/
+runs/
+
+# Build & temporary files
+*.lock
+simulation/dual/latest-run.txt
+simulation/px4-runtime/
+ziD3aBgD
+pid*.txt
+detections_*.txt
+.git.bak/
+*.bak
+.yolo/
+scratch/

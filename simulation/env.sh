@@ -1,0 +1,19 @@
+source /opt/ros/jazzy/setup.bash
+source /home/kalpeshbauskar/px4_ros2_ws/install/setup.bash
+source /home/kalpeshbauskar/nidar_rescueswarm/ros2_ws/install/setup.bash
+source /home/kalpeshbauskar/nidar_rescueswarm/venv/bin/activate
+export YOLO_CONFIG_DIR=/home/kalpeshbauskar/nidar_rescueswarm/.yolo
+export GZ_CONFIG_PATH=/usr/share/gz${GZ_CONFIG_PATH:+:$GZ_CONFIG_PATH}
+export GZ_SIM_RESOURCE_PATH=/home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/PX4-Autopilot/Tools/simulation/gz/models:/home/kalpeshbauskar/PX4-Autopilot/Tools/simulation/gz/models
+export GZ_SIM_SYSTEM_PLUGIN_PATH=/home/kalpeshbauskar/PX4-Autopilot/build/px4_sitl_default/src/modules/simulation/gz_plugins
+export LIBGL_ALWAYS_SOFTWARE=1
+export QT_QPA_PLATFORM=xcb
+export LIBGL_DRI3_DISABLE=1
+export __GLX_VENDOR_LIBRARY_NAME=mesa
+cd /home/kalpeshbauskar/nidar_rescueswarm/simulation
+
+export ROS_DOMAIN_ID=87
+export GZ_PARTITION=nidar_rescueswarm
+export ROS_LOG_DIR=/home/kalpeshbauskar/nidar_rescueswarm/simulation/logs
+export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+export GZ_IP=127.0.0.1

@@ -1,0 +1,1184 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.9">
+<world name="dual_rescue">
+    <physics name="1ms" type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer" />
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure" />
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.3 0.3 -0.9</direction>
+    </light>
+
+    <model name="flood_water">
+      <static>true</static>
+      <link name="water_link">
+        <pose>0 0 -0.05 0 0 0</pose>
+        <visual name="water_visual">
+          <geometry><box><size>320 312.5 0.1</size></box></geometry>
+          <material>
+            <ambient>0.1 0.3 0.5 0.85</ambient>
+            <diffuse>0.1 0.3 0.5 0.85</diffuse>
+          </material>
+        </visual>
+        <collision name="water_collision">
+          <geometry><box><size>320 312.5 0.1</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+
+    <model name="debris_1"><static>true</static><pose>-80 -110 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_1"><static>true</static><pose>-80 -110 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_8"><static>true</static><pose>-130 -70 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_8"><static>true</static><pose>-130 -70 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_7"><static>true</static><pose>60 -130 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_7"><static>true</static><pose>60 -130 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_10"><static>true</static><pose>130 -90 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_10"><static>true</static><pose>130 -90 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_4"><static>true</static><pose>-30 -50 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_4"><static>true</static><pose>-30 -50 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+
+    <model name="debris_5"><static>true</static><pose>90 50 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_5"><static>true</static><pose>90 50 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_6"><static>true</static><pose>-110 60 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_6"><static>true</static><pose>-110 60 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_9"><static>true</static><pose>30 80 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_9"><static>true</static><pose>30 80 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_3"><static>true</static><pose>-80 120 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_3"><static>true</static><pose>-80 120 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+
+    <model name="debris_2"><static>true</static><pose>110 140 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
+    <model name="survivor_2"><static>true</static><pose>110 140 0.9 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision><visual name="rescue_life_jacket"><pose>0 0 0.45 0 0 0</pose><geometry><box><size>0.50 0.40 0.60</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse><emissive>0.25 0.08 0.0 1</emissive></material></visual><visual name="solas_retro_tape"><pose>0 0 0.65 0 0 0</pose><geometry><box><size>0.52 0.42 0.10</size></box></geometry><material><ambient>0.95 0.95 0.95 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.4 0.4 0.4 1</emissive></material></visual></link></model>
+<magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+ <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.397971057728974</latitude_deg>
+      <longitude_deg>8.546163739800146</longitude_deg>
+      <elevation>0</elevation>
+    </spherical_coordinates>
+  <scene><ambient>0.72 0.72 0.76 1.0</ambient><background>0.62 0.76 0.90 1.0</background><shadows>true</shadows><grid>true</grid></scene><model name="parcel_0_0"><pose>-4.91 -5.075 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_0_1"><pose>-4.91 -4.925 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_0_2"><pose>-5.0 -5.0 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_0_3"><pose>-5.09 -5.075 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_0_4"><pose>-5.09 -4.925 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="rescue_0">
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_0_joint</jointName>
+      <linkName>rotor_0</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_1_joint</jointName>
+      <linkName>rotor_1</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_2_joint</jointName>
+      <linkName>rotor_2</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_3_joint</jointName>
+      <linkName>rotor_3</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="MotorFailurePlugin" name="gz::sim::systems::MotorFailureSystem">
+    </plugin>
+        <link name="rack_link">
+        <enable_wind>true</enable_wind>
+      <pose>0 0 -0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.25</mass>
+        <inertia>
+          <ixx>0.00025</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00025</iyy>
+          <iyz>0</iyz>
+          <izz>0.000417</izz>
+        </inertia>
+      </inertial>
+      <visual name="rack_rail_0"><pose>0 -0.1 0 0 0 0</pose><geometry><box><size>0.36 0.020 0.016</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="rack_rail_1"><pose>0 0.1 0 0 0 0</pose><geometry><box><size>0.36 0.020 0.016</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="rack_cross_0"><pose>-0.12 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="rack_cross_1"><pose>0.0 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="rack_cross_2"><pose>0.12 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="drop_servo_0"><pose>0.09 -0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_0"><pose>0.09 -0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_0"><pose>0.09 -0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_0"><pose>0.09 -0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_1"><pose>0.09 0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_1"><pose>0.09 0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_1"><pose>0.09 0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_1"><pose>0.09 0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_2"><pose>0.0 0.0 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_2"><pose>0.0 0.0 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_2"><pose>0.0 0.0 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_2"><pose>0.0 0.022 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_3"><pose>-0.09 -0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_3"><pose>-0.09 -0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_3"><pose>-0.09 -0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_3"><pose>-0.09 -0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_4"><pose>-0.09 0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_4"><pose>-0.09 0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_4"><pose>-0.09 0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_4"><pose>-0.09 0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual></link>
+    <joint name="rack_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>rack_link</child>
+    </joint>
+        <link name="camera_link">
+      <pose>0.15 0 -0.06 0 1.3090 0</pose>
+      <inertial>
+        <mass>0.061</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <sensor name="nadir_camera" type="camera">
+        <camera>
+          <horizontal_fov>1.5708</horizontal_fov>
+          <image>
+            <width>960</width>
+            <height>720</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>100</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <topic>/rescue_0/camera/image_raw</topic>
+      </sensor>
+    <visual name="camera_body_visual"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.03 0.08 0.025</size></box></geometry><material><ambient>0.20 0.22 0.26 1</ambient><diffuse>0.30 0.32 0.38 1</diffuse></material></visual><visual name="camera_lens_visual"><pose>0 0 -0.015 0 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.010</length></cylinder></geometry><material><ambient>0.0 0.8 1.0 1</ambient><diffuse>0.0 0.8 1.0 1</diffuse><emissive>0.0 0.2 0.3 1</emissive></material></visual></link>
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+    </joint>
+  <pose>-5 -5 0.24 0 0 0</pose><link name="base_link">
+        <enable_wind>true</enable_wind>
+      <inertial>
+        <mass>4.784</mass>
+        <inertia>
+          <ixx>0.164988</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.164988</iyy>
+          <iyz>0</iyz>
+          <izz>0.28498</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <velocity_decay />
+      <collision name="base_link_collision_0">
+        <pose>0 0 .007 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.42 0.42 0.05</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_1">
+        <pose>0 -0.098 -.123 -0.35 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.015 0.015 0.21</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_2">
+        <pose>0 0.098 -.123 0.35 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.015 0.015 0.21</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_3">
+        <pose>0 -0.39 -.2195 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.25 0.015 0.015</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_4">
+        <pose>0 0.39 -.2195 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.25 0.015 0.015</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <sensor name="air_pressure_sensor" type="air_pressure">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <air_pressure>
+
+          <pressure>
+            <noise type="gaussian">
+              <mean>0</mean>
+              <stddev>3</stddev>
+            </noise>
+          </pressure>
+        </air_pressure>
+      </sensor>
+      <sensor name="magnetometer_sensor" type="magnetometer">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <magnetometer>
+
+
+
+
+          <x>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </z>
+        </magnetometer>
+      </sensor>
+      <sensor name="imu_sensor" type="imu">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>250</update_rate>
+        <imu>
+          <angular_velocity>
+
+
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+
+
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00637</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00637</stddev>
+              </noise>
+            </y>
+
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00686</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+      <sensor name="navsat_sensor" type="navsat">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+      </sensor>
+    <visual name="fuselage_lower_hull"><pose>0 0 0.020 0 0 0</pose><geometry><box><size>0.38 0.34 0.065</size></box></geometry><material><ambient>0.88 0.88 0.92 1</ambient><diffuse>0.95 0.95 0.98 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="fuselage_upper_canopy"><pose>0 0 0.065 0 0 0</pose><geometry><box><size>0.32 0.28 0.055</size></box></geometry><material><ambient>1.0 0.40 0.0 1</ambient><diffuse>1.0 0.40 0.0 1</diffuse><specular>1.0 0.55 0.1 1</specular></material></visual><visual name="nose_fairing"><pose>0.19 0 0.035 0 0 0</pose><geometry><box><size>0.09 0.22 0.048</size></box></geometry><material><ambient>1.0 0.40 0.0 1</ambient><diffuse>1.0 0.40 0.0 1</diffuse></material></visual><visual name="cockpit_windshield"><pose>0.14 0 0.065 0 0 0</pose><geometry><box><size>0.08 0.18 0.030</size></box></geometry><material><ambient>0.12 0.14 0.18 1</ambient><diffuse>0.18 0.20 0.25 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="canopy_id_stripe"><pose>0 0 0.095 0 0 0</pose><geometry><box><size>0.26 0.08 0.006</size></box></geometry><material><ambient>1.0 1.0 1.0 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse></material></visual><visual name="rtk_mast"><pose>-0.08 0 0.125 0 0 0</pose><geometry><cylinder><radius>0.008</radius><length>0.090</length></cylinder></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.95 0.95 1.0 1</diffuse></material></visual><visual name="rtk_antenna_dome"><pose>-0.08 0 0.175 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.018</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="cf_arm_0"><pose>0.15 -0.15 0.025 0 0 -0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_1"><pose>-0.15 0.15 0.025 0 0 -0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_2"><pose>0.15 0.15 0.025 0 0 0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_3"><pose>-0.15 -0.15 0.025 0 0 0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="arm_safety_sleeve_0"><pose>0.24 -0.24 0.025 0 0 -0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.85 0.0 1</diffuse></material></visual><visual name="arm_safety_sleeve_1"><pose>0.24 0.24 0.025 0 0 0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.85 0.0 1</diffuse></material></visual><visual name="arm_safety_sleeve_2"><pose>-0.24 0.24 0.025 0 0 -0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.20 0.20 1</ambient><diffuse>1.0 0.20 0.20 1</diffuse></material></visual><visual name="arm_safety_sleeve_3"><pose>-0.24 -0.24 0.025 0 0 0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.20 0.20 1</ambient><diffuse>1.0 0.20 0.20 1</diffuse></material></visual><visual name="heavy_motor_pod_0"><pose>0.3 -0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_0"><pose>0.3 -0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_1"><pose>-0.3 0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_1"><pose>-0.3 0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_2"><pose>0.3 0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_2"><pose>0.3 0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_3"><pose>-0.3 -0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_3"><pose>-0.3 -0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="nav_led_0"><pose>0.3 0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>0.0 1.0 0.3 1</ambient><diffuse>0.0 1.0 0.3 1</diffuse><emissive>0.0 1.0 0.3 1</emissive></material></visual><visual name="nav_led_1"><pose>0.3 -0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>0.0 1.0 0.3 1</ambient><diffuse>0.0 1.0 0.3 1</diffuse><emissive>0.0 1.0 0.3 1</emissive></material></visual><visual name="nav_led_2"><pose>-0.3 0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>1.0 0.1 0.1 1</ambient><diffuse>1.0 0.1 0.1 1</diffuse><emissive>1.0 0.1 0.1 1</emissive></material></visual><visual name="nav_led_3"><pose>-0.3 -0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>1.0 0.1 0.1 1</ambient><diffuse>1.0 0.1 0.1 1</diffuse><emissive>1.0 0.1 0.1 1</emissive></material></visual><visual name="landing_skid_left"><pose>0 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.62 0.024 0.024</size></box></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.92 0.92 0.96 1</diffuse></material></visual><visual name="skid_foot_left_0"><pose>-0.2 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="skid_foot_left_1"><pose>0.2 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="landing_skid_right"><pose>0 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.62 0.024 0.024</size></box></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.92 0.92 0.96 1</diffuse></material></visual><visual name="skid_foot_right_0"><pose>-0.2 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="skid_foot_right_1"><pose>0.2 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="landing_strut_0"><pose>0.14 -0.245 -0.107 -0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_1"><pose>-0.14 -0.245 -0.107 -0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_2"><pose>0.14 0.245 -0.107 0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_3"><pose>-0.14 0.245 -0.107 0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual></link>
+    <link name="rotor_0">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.3 -0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_0_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_0"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_0"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_0_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_0_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_0</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_1">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.3 0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_1_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_1"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_1"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_1_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_1_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_2">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.3 0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_2_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_2"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_2"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_2_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_2_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_3">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.3 -0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_3_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_3"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_3"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_3_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_3_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+  <plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_0_0</child_model><child_link>body</child_link><detach_topic>/parcel_0_0/detach</detach_topic><attach_topic>/parcel_0_0/attach</attach_topic><output_topic>/parcel_0_0/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_0_1</child_model><child_link>body</child_link><detach_topic>/parcel_0_1/detach</detach_topic><attach_topic>/parcel_0_1/attach</attach_topic><output_topic>/parcel_0_1/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_0_2</child_model><child_link>body</child_link><detach_topic>/parcel_0_2/detach</detach_topic><attach_topic>/parcel_0_2/attach</attach_topic><output_topic>/parcel_0_2/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_0_3</child_model><child_link>body</child_link><detach_topic>/parcel_0_3/detach</detach_topic><attach_topic>/parcel_0_3/attach</attach_topic><output_topic>/parcel_0_3/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_0_4</child_model><child_link>body</child_link><detach_topic>/parcel_0_4/detach</detach_topic><attach_topic>/parcel_0_4/attach</attach_topic><output_topic>/parcel_0_4/state</output_topic></plugin></model>
+<model name="parcel_1_0"><pose>5.09 -5.075 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_1_1"><pose>5.09 -4.925 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_1_2"><pose>5.0 -5.0 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_1_3"><pose>4.91 -5.075 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="parcel_1_4"><pose>4.91 -4.925 0.130 0 0 0</pose><link name="body">
+        <enable_wind>true</enable_wind><inertial><mass>0.2</mass><inertia><ixx>0.00025947</ixx><iyy>0.00025947</iyy><izz>0.0001156</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial><collision name="collision"><geometry><box><size>0.068 0.068 0.110</size></box></geometry><surface><friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction><bounce><restitution_coefficient>0.1</restitution_coefficient><threshold>100000.0</threshold></bounce><contact><ode><soft_cfm>0.001</soft_cfm><soft_erp>0.2</soft_erp><kp>1e5</kp><kd>1.0</kd><max_vel>0.1</max_vel><min_depth>0.001</min_depth></ode></contact></surface></collision><visual name="canister_body"><geometry><cylinder><radius>0.034</radius><length>0.11</length></cylinder></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.42 0.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="canister_medical_band"><pose>0 0 0 0 0 0</pose><geometry><cylinder><radius>0.035</radius><length>0.040</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_cross_h"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.07100000000000001 0.024 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_cross_v"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.024 0.07100000000000001 0.008</size></box></geometry><material><ambient>1.0 0.05 0.05 1</ambient><diffuse>1.0 0.08 0.08 1</diffuse></material></visual><visual name="canister_release_lug"><pose>0 0 0.065 0 0 0</pose><geometry><cylinder><radius>0.018</radius><length>0.020</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse><specular>0.9 0.9 0.9 1</specular></material></visual><visual name="canister_bottom_bumper"><pose>0 0 -0.061 0 0 0</pose><geometry><cylinder><radius>0.032</radius><length>0.012</length></cylinder></geometry><material><ambient>0.20 0.20 0.24 1</ambient><diffuse>0.25 0.25 0.30 1</diffuse></material></visual></link></model><model name="rescue_1">
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_0_joint</jointName>
+      <linkName>rotor_0</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_1_joint</jointName>
+      <linkName>rotor_1</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_2_joint</jointName>
+      <linkName>rotor_2</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rotor_3_joint</jointName>
+      <linkName>rotor_3</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>2.55e-05</motorConstant>
+      <momentConstant>0.016</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>1.5e-04</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <motorType>velocity</motorType>
+    </plugin>
+    <plugin filename="MotorFailurePlugin" name="gz::sim::systems::MotorFailureSystem">
+    </plugin>
+        <link name="rack_link">
+        <enable_wind>true</enable_wind>
+      <pose>0 0 -0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.25</mass>
+        <inertia>
+          <ixx>0.00025</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00025</iyy>
+          <iyz>0</iyz>
+          <izz>0.000417</izz>
+        </inertia>
+      </inertial>
+      <visual name="rack_rail_0"><pose>0 -0.1 0 0 0 0</pose><geometry><box><size>0.36 0.020 0.016</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="rack_rail_1"><pose>0 0.1 0 0 0 0</pose><geometry><box><size>0.36 0.020 0.016</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="rack_cross_0"><pose>-0.12 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="rack_cross_1"><pose>0.0 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="rack_cross_2"><pose>0.12 0 0 0 0 0</pose><geometry><box><size>0.016 0.24 0.014</size></box></geometry><material><ambient>0.25 0.25 0.28 1</ambient><diffuse>0.32 0.32 0.36 1</diffuse></material></visual><visual name="drop_servo_0"><pose>0.09 -0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_0"><pose>0.09 -0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_0"><pose>0.09 -0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_0"><pose>0.09 -0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_1"><pose>0.09 0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_1"><pose>0.09 0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_1"><pose>0.09 0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_1"><pose>0.09 0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_2"><pose>0.0 0.0 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_2"><pose>0.0 0.0 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_2"><pose>0.0 0.0 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_2"><pose>0.0 0.022 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_3"><pose>-0.09 -0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_3"><pose>-0.09 -0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_3"><pose>-0.09 -0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_3"><pose>-0.09 -0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual><visual name="drop_servo_4"><pose>-0.09 0.075 0.014 0 0 0</pose><geometry><box><size>0.026 0.018 0.022</size></box></geometry><material><ambient>0.15 0.15 0.18 1</ambient><diffuse>0.22 0.22 0.25 1</diffuse></material></visual><visual name="servo_pin_4"><pose>-0.09 0.075 -0.005 0 0 0</pose><geometry><cylinder><radius>0.004</radius><length>0.018</length></cylinder></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.90 0.90 0.95 1</diffuse></material></visual><visual name="latch_collar_4"><pose>-0.09 0.075 -0.012 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.008</length></cylinder></geometry><material><ambient>0.30 0.30 0.35 1</ambient><diffuse>0.40 0.40 0.45 1</diffuse></material></visual><visual name="bay_status_led_4"><pose>-0.09 0.097 0.016 0 0 0</pose><geometry><sphere><radius>0.008</radius></sphere></geometry><material><ambient>0.0 1.0 0.2 1</ambient><diffuse>0.0 1.0 0.2 1</diffuse><emissive>0.0 0.8 0.2 1</emissive></material></visual></link>
+    <joint name="rack_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>rack_link</child>
+    </joint>
+        <link name="camera_link">
+      <pose>0.15 0 -0.06 0 1.3090 0</pose>
+      <inertial>
+        <mass>0.061</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <sensor name="nadir_camera" type="camera">
+        <camera>
+          <horizontal_fov>1.5708</horizontal_fov>
+          <image>
+            <width>960</width>
+            <height>720</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>100</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <topic>/rescue_1/camera/image_raw</topic>
+      </sensor>
+    <visual name="camera_body_visual"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.03 0.08 0.025</size></box></geometry><material><ambient>0.20 0.22 0.26 1</ambient><diffuse>0.30 0.32 0.38 1</diffuse></material></visual><visual name="camera_lens_visual"><pose>0 0 -0.015 0 0 0</pose><geometry><cylinder><radius>0.012</radius><length>0.010</length></cylinder></geometry><material><ambient>0.0 0.8 1.0 1</ambient><diffuse>0.0 0.8 1.0 1</diffuse><emissive>0.0 0.2 0.3 1</emissive></material></visual></link>
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+    </joint>
+  <pose>5 -5 0.24 0 0 0</pose><link name="base_link">
+        <enable_wind>true</enable_wind>
+      <inertial>
+        <mass>4.784</mass>
+        <inertia>
+          <ixx>0.164988</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.164988</iyy>
+          <iyz>0</iyz>
+          <izz>0.28498</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <velocity_decay />
+      <collision name="base_link_collision_0">
+        <pose>0 0 .007 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.42 0.42 0.05</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_1">
+        <pose>0 -0.098 -.123 -0.35 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.015 0.015 0.21</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_2">
+        <pose>0 0.098 -.123 0.35 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.015 0.015 0.21</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_3">
+        <pose>0 -0.39 -.2195 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.25 0.015 0.015</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <collision name="base_link_collision_4">
+        <pose>0 0.39 -.2195 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.25 0.015 0.015</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+      <sensor name="air_pressure_sensor" type="air_pressure">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <air_pressure>
+
+          <pressure>
+            <noise type="gaussian">
+              <mean>0</mean>
+              <stddev>3</stddev>
+            </noise>
+          </pressure>
+        </air_pressure>
+      </sensor>
+      <sensor name="magnetometer_sensor" type="magnetometer">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <magnetometer>
+
+
+
+
+          <x>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <stddev>0.0001</stddev>
+            </noise>
+          </z>
+        </magnetometer>
+      </sensor>
+      <sensor name="imu_sensor" type="imu">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>250</update_rate>
+        <imu>
+          <angular_velocity>
+
+
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0008726646</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+
+
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00637</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00637</stddev>
+              </noise>
+            </y>
+
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.00686</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+      <sensor name="navsat_sensor" type="navsat">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+      </sensor>
+    <visual name="fuselage_lower_hull"><pose>0 0 0.020 0 0 0</pose><geometry><box><size>0.38 0.34 0.065</size></box></geometry><material><ambient>0.88 0.88 0.92 1</ambient><diffuse>0.95 0.95 0.98 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="fuselage_upper_canopy"><pose>0 0 0.065 0 0 0</pose><geometry><box><size>0.32 0.28 0.055</size></box></geometry><material><ambient>0.0 0.75 1.0 1</ambient><diffuse>0.0 0.75 1.0 1</diffuse><specular>0.2 0.85 1.0 1</specular></material></visual><visual name="nose_fairing"><pose>0.19 0 0.035 0 0 0</pose><geometry><box><size>0.09 0.22 0.048</size></box></geometry><material><ambient>0.0 0.75 1.0 1</ambient><diffuse>0.0 0.75 1.0 1</diffuse></material></visual><visual name="cockpit_windshield"><pose>0.14 0 0.065 0 0 0</pose><geometry><box><size>0.08 0.18 0.030</size></box></geometry><material><ambient>0.12 0.14 0.18 1</ambient><diffuse>0.18 0.20 0.25 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="canopy_id_stripe"><pose>0 0 0.095 0 0 0</pose><geometry><box><size>0.26 0.08 0.006</size></box></geometry><material><ambient>1.0 1.0 1.0 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse></material></visual><visual name="rtk_mast"><pose>-0.08 0 0.125 0 0 0</pose><geometry><cylinder><radius>0.008</radius><length>0.090</length></cylinder></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.95 0.95 1.0 1</diffuse></material></visual><visual name="rtk_antenna_dome"><pose>-0.08 0 0.175 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.018</length></cylinder></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="cf_arm_0"><pose>0.15 -0.15 0.025 0 0 -0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_1"><pose>-0.15 0.15 0.025 0 0 -0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_2"><pose>0.15 0.15 0.025 0 0 0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="cf_arm_3"><pose>-0.15 -0.15 0.025 0 0 0.7854</pose><geometry><box><size>0.435 0.042 0.032</size></box></geometry><material><ambient>0.26 0.26 0.30 1</ambient><diffuse>0.34 0.34 0.38 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="arm_safety_sleeve_0"><pose>0.24 -0.24 0.025 0 0 -0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.85 0.0 1</diffuse></material></visual><visual name="arm_safety_sleeve_1"><pose>0.24 0.24 0.025 0 0 0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.85 0.0 1</diffuse></material></visual><visual name="arm_safety_sleeve_2"><pose>-0.24 0.24 0.025 0 0 -0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.20 0.20 1</ambient><diffuse>1.0 0.20 0.20 1</diffuse></material></visual><visual name="arm_safety_sleeve_3"><pose>-0.24 -0.24 0.025 0 0 0.7854</pose><geometry><box><size>0.080 0.046 0.036</size></box></geometry><material><ambient>1.0 0.20 0.20 1</ambient><diffuse>1.0 0.20 0.20 1</diffuse></material></visual><visual name="heavy_motor_pod_0"><pose>0.3 -0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_0"><pose>0.3 -0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_1"><pose>-0.3 0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_1"><pose>-0.3 0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_2"><pose>0.3 0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_2"><pose>0.3 0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="heavy_motor_pod_3"><pose>-0.3 -0.3 0.035 0 0 0</pose><geometry><cylinder><radius>0.040</radius><length>0.048</length></cylinder></geometry><material><ambient>0.45 0.45 0.50 1</ambient><diffuse>0.58 0.58 0.64 1</diffuse><specular>0.8 0.8 0.8 1</specular></material></visual><visual name="motor_bell_3"><pose>-0.3 -0.3 0.056 0 0 0</pose><geometry><cylinder><radius>0.038</radius><length>0.016</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse><specular>0.95 0.95 0.95 1</specular></material></visual><visual name="nav_led_0"><pose>0.3 0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>0.0 1.0 0.3 1</ambient><diffuse>0.0 1.0 0.3 1</diffuse><emissive>0.0 1.0 0.3 1</emissive></material></visual><visual name="nav_led_1"><pose>0.3 -0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>0.0 1.0 0.3 1</ambient><diffuse>0.0 1.0 0.3 1</diffuse><emissive>0.0 1.0 0.3 1</emissive></material></visual><visual name="nav_led_2"><pose>-0.3 0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>1.0 0.1 0.1 1</ambient><diffuse>1.0 0.1 0.1 1</diffuse><emissive>1.0 0.1 0.1 1</emissive></material></visual><visual name="nav_led_3"><pose>-0.3 -0.3 0.068 0 0 0</pose><geometry><sphere><radius>0.016</radius></sphere></geometry><material><ambient>1.0 0.1 0.1 1</ambient><diffuse>1.0 0.1 0.1 1</diffuse><emissive>1.0 0.1 0.1 1</emissive></material></visual><visual name="landing_skid_left"><pose>0 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.62 0.024 0.024</size></box></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.92 0.92 0.96 1</diffuse></material></visual><visual name="skid_foot_left_0"><pose>-0.2 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="skid_foot_left_1"><pose>0.2 -0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="landing_skid_right"><pose>0 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.62 0.024 0.024</size></box></geometry><material><ambient>0.85 0.85 0.90 1</ambient><diffuse>0.92 0.92 0.96 1</diffuse></material></visual><visual name="skid_foot_right_0"><pose>-0.2 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="skid_foot_right_1"><pose>0.2 0.39 -0.2195 0 0 0</pose><geometry><box><size>0.080 0.028 0.028</size></box></geometry><material><ambient>1.0 0.85 0.0 1</ambient><diffuse>1.0 0.90 0.0 1</diffuse></material></visual><visual name="landing_strut_0"><pose>0.14 -0.245 -0.107 -0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_1"><pose>-0.14 -0.245 -0.107 -0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_2"><pose>0.14 0.245 -0.107 0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual><visual name="landing_strut_3"><pose>-0.14 0.245 -0.107 0.912 0 0</pose><geometry><box><size>0.024 0.024 0.367</size></box></geometry><material><ambient>0.80 0.80 0.85 1</ambient><diffuse>0.88 0.88 0.92 1</diffuse></material></visual></link>
+    <link name="rotor_0">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.3 -0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_0_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_0"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_0"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_0_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_0_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_0</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_1">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.3 0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_1_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_1"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_1"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_1_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_1_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_2">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.3 0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_2_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_2"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_2"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_2_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_2_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name="rotor_3">
+        <enable_wind>true</enable_wind>
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.3 -0.3 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>5.769736572598999e-07</ixx>
+          <iyy>3.91737775375512e-05</iyy>
+          <izz>3.974787352071006e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name="rotor_3_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        <geometry>
+          <box>
+            <size>0.2792307692307692 0.016923076923076923 0.0008461538461538462</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+    <visual name="prop_hub_3"><pose>0 0 0.010 0 0 0</pose><geometry><cylinder><radius>0.020</radius><length>0.022</length></cylinder></geometry><material><ambient>0.75 0.75 0.80 1</ambient><diffuse>0.85 0.85 0.90 1</diffuse></material></visual><visual name="prop_blade_3"><pose>0 0 0.010 0 0 0</pose><geometry><box><size>0.33 0.034 0.004</size></box></geometry><material><ambient>0.20 0.20 0.22 1</ambient><diffuse>0.26 0.26 0.30 1</diffuse><specular>0.6 0.6 0.6 1</specular></material></visual><visual name="prop_tip_3_0"><pose>-0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual><visual name="prop_tip_3_1"><pose>0.14 0 0.0105 0 0 0</pose><geometry><box><size>0.052 0.036 0.005</size></box></geometry><material><ambient>0.95 0.95 0.98 1</ambient><diffuse>1.0 1.0 1.0 1</diffuse><emissive>0.3 0.3 0.3 1</emissive></material></visual></link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+  <plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_1_0</child_model><child_link>body</child_link><detach_topic>/parcel_1_0/detach</detach_topic><attach_topic>/parcel_1_0/attach</attach_topic><output_topic>/parcel_1_0/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_1_1</child_model><child_link>body</child_link><detach_topic>/parcel_1_1/detach</detach_topic><attach_topic>/parcel_1_1/attach</attach_topic><output_topic>/parcel_1_1/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_1_2</child_model><child_link>body</child_link><detach_topic>/parcel_1_2/detach</detach_topic><attach_topic>/parcel_1_2/attach</attach_topic><output_topic>/parcel_1_2/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_1_3</child_model><child_link>body</child_link><detach_topic>/parcel_1_3/detach</detach_topic><attach_topic>/parcel_1_3/attach</attach_topic><output_topic>/parcel_1_3/state</output_topic></plugin><plugin filename="gz-sim-detachable-joint-system" name="gz::sim::systems::DetachableJoint"><parent_link>base_link</parent_link><child_model>parcel_1_4</child_model><child_link>body</child_link><detach_topic>/parcel_1_4/detach</detach_topic><attach_topic>/parcel_1_4/attach</attach_topic><output_topic>/parcel_1_4/state</output_topic></plugin></model>
+<gui fullscreen="0"><camera name="user_camera"><pose>0 -14 3.8 0 0.22 1.5708</pose><view_controller>orbit</view_controller></camera></gui>
+    <plugin filename="gz-sim-wind-effects-system" name="gz::sim::systems::WindEffects">
+      <force_approximation_scaling_factor>1</force_approximation_scaling_factor>
+      <horizontal>
+        <magnitude>
+          <time_for_rise>1</time_for_rise>
+          <sin>
+            <amplitude_percent>0</amplitude_percent>
+            <period>60</period>
+          </sin>
+          <noise type="none"></noise>
+        </magnitude>
+        <direction>
+          <time_for_rise>1</time_for_rise>
+          <sin>
+            <amplitude>0</amplitude>
+            <period>20</period>
+          </sin>
+          <noise type="none"></noise>
+        </direction>
+      </horizontal>
+      <vertical>
+        <noise type="none"></noise>
+      </vertical>
+    </plugin>
+
+    <wind>
+      <linear_velocity>0 5.0 0</linear_velocity>
+    </wind>
+
+</world>
+
+</sdf>

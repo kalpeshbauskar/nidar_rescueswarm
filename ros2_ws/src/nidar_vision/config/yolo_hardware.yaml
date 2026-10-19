@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    model_path: '/home/kalpeshbauskar/nidar_rescueswarm/models/person_best.onnx'
+    confidence_threshold: 0.40
+    iou_threshold: 0.45
+    device: 'cuda'
+    image_topic: '/nidar/camera/image_raw'
+    annotated_image_topic: '/nidar/yolo/image_annotated'
+    detections_topic: '/nidar/yolo/detections'
+    
+    # Hardening parameters (Hardware strict defaults)
+    simulation_mode: false
+    vision_release_enabled: false
+    min_consecutive_frames: 5
+    min_confidence: 0.40
+    max_detection_age_sec: 1.0
+    min_box_area_px: 0
+    max_box_area_px: 1000000

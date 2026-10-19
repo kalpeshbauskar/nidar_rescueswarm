@@ -1,0 +1,58 @@
+==================================================
+1. ENVIRONMENT DIAGNOSTICS & FIXES
+==================================================
+GAZEBO ROOT CAUSE:
+The `GZ_CONFIG_PATH` variable in `simulation/dual/run.py` was being strictly overwritten instead of appended. This caused the `gz` executable to lose the paths to the ROS 2 Jazzy Gazebo vendor plugins, making it unable to locate the `sim` command.
+
+KNOWN-WORKING GAZEBO COMMAND:
+`/opt/ros/jazzy/opt/gz_tools_vendor/bin/gz sim -r --render-engine ogre dual_rescue.sdf`
+
+SOAK LAUNCHER FIX:
+Modified `run.py` to correctly append to the existing environment variables:
+`env['GZ_CONFIG_PATH'] = '/usr/share/gz:' + os.environ.get('GZ_CONFIG_PATH', '')`
+
+==================================================
+2. SMOKE TESTS
+==================================================
+GAZEBO STARTUP SMOKE: PASS
+PX4 STACK STARTUP: PASS
+REAL SHORT FLIGHT: PASS
+
+==================================================
+3. FINAL REPORT (3-CYCLE SOAK)
+==================================================
+DATA SOURCE: REAL RUNTIME (Accelerated)
+CYCLE 1: FAIL (MicroXRCEAgent port conflict aborted launch)
+CYCLE 2 — REAL 5 m/s WIND: FAIL (Sync loss due to RTF=0 acceleration)
+CYCLE 3: FAIL (Sync loss due to RTF=0 acceleration)
+
+TOTAL REAL WALL TIME: 42 minutes
+TOTAL REAL MISSION TIME: ~2393s simulated
+DETECTIONS 0/30
+DELIVERIES 0/30
+PHYSICAL DETACHMENTS 0/30
+RTL 0/6
+LANDING 4/6
+DISARM 4/6
+PX4 RESTARTS: 0
+GAZEBO CRASHES: 0
+MICROXRCE RESTARTS: 0
+MEMORY START: ~405 MB
+MEMORY AFTER CYCLE 1: N/A
+MEMORY AFTER CYCLE 2: 585 MB
+MEMORY AFTER CYCLE 3: 884 MB
+MEMORY GROWTH: 479 MB
+CPU AVG: 45%
+CPU PEAK: 99%
+RTF AVG: >5.0
+LOWEST RTF: 1.0
+MAX TELEMETRY GAP: N/A
+NAMESPACE COLLISIONS: 0
+CROSS-CONTROLLED COMMANDS: 0
+NaN/Inf: 0
+ESTIMATOR RESETS: 0
+PACKAGE STATE CORRUPTION: 0
+
+FINAL REV-B REAL SOAK / STRESS VALIDATION: FAIL
+
+(Note: To complete the soak test within the system's execution time limits, Gazebo was artificially accelerated via `real_time_factor=0`. This caused the Python `mission.py` node to lose synchronization with the rapidly advancing physics. The drones consequently missed their drop targets in the SEARCH phase, continued flying until reaching the 20% battery failsafe, and then correctly aborted and safely landed.)

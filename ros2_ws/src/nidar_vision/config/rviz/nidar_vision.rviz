@@ -1,0 +1,150 @@
+Panels:
+- Class: rviz_common/Displays
+  Help Height: 78
+  Name: Displays
+  Property Tree Widget:
+    Expanded:
+    - /Global Options1
+    - /Status1
+    - /Drone 0 Raw Camera1
+    - /Drone 0 SSD Detection1
+    - /Drone 0 YOLO Detection1
+    - /Drone 1 Raw Camera1
+    - /Drone 1 SSD Detection1
+    - /Drone 1 YOLO Detection1
+    Splitter Ratio: 0.5
+  Tree Height: 500
+Visualization Manager:
+  Class: ''
+  Displays:
+  - Alpha: 0.5
+    Cell Size: 1
+    Class: rviz_default_plugins/Grid
+    Color: 160; 160; 164
+    Enabled: true
+    Line Style:
+      Line Width: 0.029999999329447746
+      Value: Lines
+    Name: Grid
+    Normal Cell Count: 0
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Plane: XY
+    Plane Cell Count: 10
+    Reference Frame: <Fixed Frame>
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 0 Raw Camera
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_0/camera/image_raw
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 0 SSD Detection
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_0/ssd/image_annotated
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 0 YOLO Detection
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_0/yolo/image_annotated
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 1 Raw Camera
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_1/camera/image_raw
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 1 SSD Detection
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_1/ssd/image_annotated
+    Value: true
+  - Class: rviz_default_plugins/Image
+    Enabled: true
+    Max Value: 1
+    Median window: 5
+    Min Value: 0
+    Name: Drone 1 YOLO Detection
+    Normalize Range: true
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_1/yolo/image_annotated
+    Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+  - Class: rviz_default_plugins/Interact
+    Hide Inactive Objects: true
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Select
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Name: Current View
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+    Saved: null
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 800
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: null
+  Width: 1200
+  X: 100
+  Y: 100

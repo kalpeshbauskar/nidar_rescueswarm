@@ -1,0 +1,39 @@
+{
+  "duration": 605.0097485890001,
+  "fail_reason": null,
+  "max_age_1": 0.5002771509998638,
+  "max_age_2": 0.5051763439996648,
+  "milestones": {
+    "60": {
+      "drone1_age": 2.9099999665049836e-05,
+      "drone2_age": -0.016078453000318405,
+      "healthy": true
+    },
+    "300": {
+      "drone1_age": -0.003978572000050917,
+      "drone2_age": 3.1693999972048914e-05,
+      "healthy": true
+    },
+    "435": {
+      "drone1_age": -0.0028819029998885526,
+      "drone2_age": 4.618100001607672e-05,
+      "healthy": true
+    },
+    "450": {
+      "drone1_age": -0.003989685999840731,
+      "drone2_age": 4.515999989962438e-05,
+      "healthy": true
+    },
+    "600": {
+      "drone1_age": -0.004104402999928425,
+      "drone2_age": 3.2561999887548154e-05,
+      "healthy": true
+    }
+  },
+  "errors": {
+    "unreachable": 0,
+    "multicast": 0,
+    "disconnect": 0,
+    "timeout": 0
+  }
+}
