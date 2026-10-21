@@ -29,7 +29,8 @@ setup(
         'console_scripts': [
             'yolo_person_node = nidar_vision.yolo_person_node:main',
             'ssd_person_node = nidar_vision.ssd_person_node:main',
-            'metrics_node = nidar_vision.metrics_node:main'
+            'metrics_node = nidar_vision.metrics_node:main',
+            'rviz_telemetry_node = nidar_vision.rviz_telemetry_node:main',
         ],
     },
 )

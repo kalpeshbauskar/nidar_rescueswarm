@@ -21,11 +21,15 @@ def generate_launch_description():
     use_ssd = IfCondition(PythonExpression(["'", detector, "' in ['ssd', 'both']"]))
     use_yolo = IfCondition(PythonExpression(["'", detector, "' in ['yolo', 'both']"]))
 
-    # Bridge for Drone 0
+    # Consolidated Gazebo -> ROS Bridge for Camera and LiDAR (Scans & 3D Point Clouds)
     bridge_0 = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/rescue_0/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image'],
+        arguments=[
+            '/rescue_0/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/rescue_0/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '/rescue_0/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
+        ],
         output='screen'
     )
     
@@ -61,11 +65,15 @@ def generate_launch_description():
         output='screen'
     )
     
-    # Bridge for Drone 1
+    # Consolidated Gazebo -> ROS Bridge for Drone 1 (Camera, LiDAR 2D & 3D)
     bridge_1 = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/rescue_1/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image'],
+        arguments=[
+            '/rescue_1/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/rescue_1/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '/rescue_1/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
+        ],
         output='screen'
     )
 
@@ -109,6 +117,14 @@ def generate_launch_description():
         arguments=['--x', '0', '--y', '0', '--z', '0', '--yaw', '0', '--pitch', '0', '--roll', '0', '--frame-id', 'world', '--child-frame-id', 'base_link'],
         output='screen'
     )
+
+    # RViz Telemetry & Visualization Node (Translates drone avionics, TFs, and markers for RViz2)
+    telemetry_node = Node(
+        package='nidar_vision',
+        executable='rviz_telemetry_node',
+        name='rviz_telemetry_node',
+        output='screen'
+    )
     
     return LaunchDescription([
         detector_arg,
@@ -118,5 +134,6 @@ def generate_launch_description():
         bridge_1,
         ssd_1,
         yolo_1,
-        tf_world_base
+        tf_world_base,
+        telemetry_node
     ])

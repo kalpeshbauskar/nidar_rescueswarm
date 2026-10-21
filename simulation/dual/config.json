@@ -56,6 +56,88 @@
           "north_max": 156.25,
           "area_m2": 40625
         }
+      ],
+      "survivors": [
+        {
+          "id": 1,
+          "name": "survivor_1",
+          "east": -80,
+          "north": -110,
+          "z": 0.05,
+          "sector": 1
+        },
+        {
+          "id": 8,
+          "name": "survivor_8",
+          "east": -130,
+          "north": -70,
+          "z": 0.05,
+          "sector": 1
+        },
+        {
+          "id": 7,
+          "name": "survivor_7",
+          "east": 60,
+          "north": -130,
+          "z": 0.05,
+          "sector": 1
+        },
+        {
+          "id": 10,
+          "name": "survivor_10",
+          "east": 130,
+          "north": -90,
+          "z": 0.05,
+          "sector": 1
+        },
+        {
+          "id": 4,
+          "name": "survivor_4",
+          "east": -30,
+          "north": -50,
+          "z": 0.05,
+          "sector": 1
+        },
+        {
+          "id": 5,
+          "name": "survivor_5",
+          "east": 90,
+          "north": 50,
+          "z": 0.05,
+          "sector": 2
+        },
+        {
+          "id": 6,
+          "name": "survivor_6",
+          "east": -110,
+          "north": 60,
+          "z": 0.05,
+          "sector": 2
+        },
+        {
+          "id": 9,
+          "name": "survivor_9",
+          "east": 30,
+          "north": 80,
+          "z": 0.05,
+          "sector": 2
+        },
+        {
+          "id": 3,
+          "name": "survivor_3",
+          "east": -80,
+          "north": 120,
+          "z": 0.05,
+          "sector": 2
+        },
+        {
+          "id": 2,
+          "name": "survivor_2",
+          "east": 110,
+          "north": 140,
+          "z": 0.05,
+          "sector": 2
+        }
       ]
     }
   },

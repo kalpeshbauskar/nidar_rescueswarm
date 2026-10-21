@@ -12,31 +12,31 @@
   </asset>
   <library_images>
     <image id="young_lightskinned_female_diffuse_png" name="young_lightskinned_female_diffuse_png">
-      <init_from>young_lightskinned_female_diffuse.png</init_from>
+      <init_from>../materials/textures/young_lightskinned_female_diffuse.png</init_from>
     </image>
     <image id="ponytail01_diffuse_png" name="ponytail01_diffuse_png">
-      <init_from>ponytail01_diffuse.png</init_from>
+      <init_from>../materials/textures/ponytail01_diffuse.png</init_from>
     </image>
     <image id="brown_eye_png" name="brown_eye_png">
-      <init_from>brown_eye.png</init_from>
+      <init_from>../materials/textures/brown_eye.png</init_from>
     </image>
     <image id="eyebrow002_png" name="eyebrow002_png">
-      <init_from>eyebrow002.png</init_from>
+      <init_from>../materials/textures/eyebrow002.png</init_from>
     </image>
     <image id="eyelashes01_png" name="eyelashes01_png">
-      <init_from>eyelashes01.png</init_from>
+      <init_from>../materials/textures/eyelashes01.png</init_from>
     </image>
     <image id="tongue01_diffuse_png" name="tongue01_diffuse_png">
-      <init_from>tongue01_diffuse.png</init_from>
+      <init_from>../materials/textures/tongue01_diffuse.png</init_from>
     </image>
     <image id="female_casualsuit02_diffuse_png" name="female_casualsuit02_diffuse_png">
-      <init_from>female_casualsuit02_diffuse.png</init_from>
+      <init_from>../materials/textures/female_casualsuit02_diffuse.png</init_from>
     </image>
     <image id="female_casualsuit01_diffuse_png" name="female_casualsuit01_diffuse_png">
-      <init_from>female_casualsuit01_diffuse.png</init_from>
+      <init_from>../materials/textures/female_casualsuit01_diffuse.png</init_from>
     </image>
     <image id="shoes05_diffuse_png" name="shoes05_diffuse_png">
-      <init_from>shoes05_diffuse.png</init_from>
+      <init_from>../materials/textures/shoes05_diffuse.png</init_from>
     </image>
   </library_images>
   <library_effects>

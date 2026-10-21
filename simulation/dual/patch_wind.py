@@ -1,6 +1,10 @@
 import sys, re
 
 def add_wind(sdf_path, speed_mps, direction_x=0.0):
+    if speed_mps <= 0.001:
+        print(f"[WIND] Zero wind requested ({speed_mps:.1f} m/s). Keeping environment calm and level.")
+        return
+
     with open(sdf_path, 'r') as f:
         sdf = f.read()
         
@@ -55,5 +59,7 @@ def add_wind(sdf_path, speed_mps, direction_x=0.0):
         f.write(sdf)
 
 if __name__ == '__main__':
-    add_wind('dual_rescue.sdf', float(sys.argv[1]))
+    speed = float(sys.argv[1]) if len(sys.argv) > 1 else 0.0
+    target_sdf = sys.argv[2] if len(sys.argv) > 2 else 'dual_rescue.sdf'
+    add_wind(target_sdf, speed)
 

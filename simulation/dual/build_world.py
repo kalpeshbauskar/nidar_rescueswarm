@@ -79,10 +79,26 @@ if sun is not None:
     if d is not None:
         d.text = "1.0 1.0 1.0 1"
 
-# Remove any pre-existing drone models and parcels from template world
+# Optional custom survivor positioning from config.json (allows easy relocation)
+custom_survivors = profile.get("survivors", cfg.get("survivors", None))
+if custom_survivors:
+    for s_info in custom_survivors:
+        sid = s_info.get("id")
+        s_east = s_info.get("east", 0.0)
+        s_north = s_info.get("north", 0.0)
+        s_z = s_info.get("z", 0.05)
+        s_mod = w.find(f"model[@name='survivor_{sid}']")
+        if s_mod is not None:
+            p = s_mod.find("pose")
+            if p is not None:
+                parts = p.text.strip().split()
+                rot_str = " ".join(parts[3:]) if len(parts) >= 6 else "0 0 0"
+                p.text = f"{s_east} {s_north} {s_z} {rot_str}"
+
+# Remove any pre-existing drone models, parcels, or debris pads from template world
 for existing in list(w.findall("model")):
     m_name = existing.get("name", "")
-    if m_name.startswith("rescue_") or m_name.startswith("parcel_"):
+    if m_name.startswith("rescue_") or m_name.startswith("parcel_") or m_name.startswith("debris_"):
         w.remove(existing)
 
 total_parcels_built = 0
@@ -93,18 +109,48 @@ for d_spec in drone_specs:
     pkg_count = d_spec["packages"]
     total_parcels_built += pkg_count
 
-    m = E.parse(BASE / "imported/PX4-Autopilot/Tools/simulation/gz/models/rescue_heavy/model.sdf").getroot().find("model")
-    m.set("name", f"rescue_{i}")
-    sub(m, "pose", f"{east} -5 0.24 0 0 0")
-
-    # Merge rescue_heavy_base links and joints directly into model so masses are authoritative
+    raw_m = E.parse(BASE / "imported/PX4-Autopilot/Tools/simulation/gz/models/rescue_heavy/model.sdf").getroot().find("model")
     base_m = E.parse(BASE / "imported/PX4-Autopilot/Tools/simulation/gz/models/rescue_heavy_base/model.sdf").getroot().find("model")
-    inc = m.find("include")
-    if inc is not None:
-        m.remove(inc)
-    for child in list(base_m):
-        if child.tag in ("link", "joint"):
-            m.append(copy.deepcopy(child))
+
+    m = E.Element("model", name=f"rescue_{i}", canonical_link="base_link")
+    sub(m, "pose", f"{east} -5 0.24 0 0 0")
+    sub(m, "self_collide", "false")
+    sub(m, "static", "false")
+
+    # 1. Base link and rotors from base_m (base_link MUST be first for physics stability)
+    base_link = copy.deepcopy(base_m.find("link[@name='base_link']"))
+    m.append(base_link)
+    for r_idx in range(4):
+        rl = base_m.find(f"link[@name='rotor_{r_idx}']")
+        rj = base_m.find(f"joint[@name='rotor_{r_idx}_joint']")
+        if rl is not None:
+            m.append(copy.deepcopy(rl))
+        if rj is not None:
+            m.append(copy.deepcopy(rj))
+
+    # 2. Rack link and joint from raw_m
+    rack_l = raw_m.find("link[@name='rack_link']")
+    rack_j = raw_m.find("joint[@name='rack_joint']")
+    if rack_l is not None:
+        m.append(copy.deepcopy(rack_l))
+    if rack_j is not None:
+        m.append(copy.deepcopy(rack_j))
+
+    # 3. Camera link and joint from raw_m
+    cam_l = raw_m.find("link[@name='camera_link']")
+    cam_j = raw_m.find("joint[@name='camera_joint']")
+    if cam_l is not None:
+        m.append(copy.deepcopy(cam_l))
+    if cam_j is not None:
+        m.append(copy.deepcopy(cam_j))
+
+    # 4. Plugins from raw_m (MulticopterMotorModel 0..3, MotorFailureSystem)
+    for plug in raw_m.findall("plugin"):
+        m.append(copy.deepcopy(plug))
+
+    for elem in list(m.iter()):
+        for gzf in [c for c in list(elem) if c.tag == "gz_frame_id"]:
+            elem.remove(gzf)
 
     # Authoritative hardware masses from simulation.hardware.config
     dry_mass = get_drone_dry_mass_kg(min(i, FLEET_SIZE - 1))
@@ -460,13 +506,54 @@ for d_spec in drone_specs:
     if c0 is not None:
         c0.find('geometry/box/size').text = '0.42 0.42 0.05'
 
-    # Set wide landing gear track (780mm track width) for crosswind touchdown stability
-    c3 = base_link.find("collision[@name='base_link_collision_3']")
-    if c3 is not None:
-        c3.find('pose').text = '0 -0.39 -.2195 0 0 0'
-    c4 = base_link.find("collision[@name='base_link_collision_4']")
-    if c4 is not None:
-        c4.find('pose').text = '0 0.39 -.2195 0 0 0'
+    # Remove old diagonal strut collisions that stick down at y = ±0.098 and cause tipping/rocking
+    for old_c in ["base_link_collision_1", "base_link_collision_2"]:
+        c_el = base_link.find(f"collision[@name='{old_c}']")
+        if c_el is not None:
+            base_link.remove(c_el)
+
+    # Set wide, full-length landing gear skid collisions (0.62 x 0.030 x 0.028m at y = ±0.39m)
+    # matching visual skids and pads exactly for rock-solid 4-point ground stability
+    for skid_name, sy in [("base_link_collision_3", -0.39), ("base_link_collision_4", 0.39)]:
+        cs = base_link.find(f"collision[@name='{skid_name}']")
+        if cs is not None:
+            p_el = cs.find("pose")
+            if p_el is not None:
+                p_el.text = f"0 {sy} -0.2195 0 0 0"
+            s_el = cs.find("geometry/box/size")
+            if s_el is not None:
+                s_el.text = "0.62 0.030 0.028"
+            surf = cs.find("surface")
+            if surf is None:
+                surf = E.SubElement(cs, "surface")
+            fric = surf.find("friction")
+            if fric is None:
+                fric = E.SubElement(surf, "friction")
+            ode_f = fric.find("ode")
+            if ode_f is None:
+                ode_f = E.SubElement(fric, "ode")
+            mu = ode_f.find("mu")
+            if mu is None:
+                sub(ode_f, "mu", "1.0")
+            else:
+                mu.text = "1.0"
+            mu2 = ode_f.find("mu2")
+            if mu2 is None:
+                sub(ode_f, "mu2", "1.0")
+            else:
+                mu2.text = "1.0"
+            cont = surf.find("contact")
+            if cont is None:
+                cont = E.SubElement(surf, "contact")
+            ode_c = cont.find("ode")
+            if ode_c is None:
+                ode_c = E.SubElement(cont, "ode")
+            for k, v in [("min_depth", "0.002"), ("max_vel", "0.0"), ("kp", "100000.0"), ("kd", "1.0")]:
+                item = ode_c.find(k)
+                if item is None:
+                    sub(ode_c, k, v)
+                else:
+                    item.text = v
 
     # 13. High-Resolution Nadir Search Camera (Fixed Rock-Solid Frame Mount)
     cam_joint = m.find("joint[@name='camera_joint']")
@@ -539,14 +626,87 @@ for d_spec in drone_specs:
     cam = m.find("link[@name='camera_link']/sensor")
     if cam is not None:
         cam.find("topic").text = f"/rescue_{i}/camera/image_raw"
-        cam.find("update_rate").text = "20"
-        cam.find("camera/image/width").text = "960"
-        cam.find("camera/image/height").text = "720"
+        cam.find("update_rate").text = "30"
+        cam.find("camera/image/width").text = "1280"
+        cam.find("camera/image/height").text = "960"
+        cam_fmt = cam.find("camera/image/format")
+        if cam_fmt is not None:
+            cam_fmt.text = "R8G8B8"
+        else:
+            sub(cam.find("camera/image"), "format", "R8G8B8")
+        clip_el = cam.find("camera/clip")
+        if clip_el is not None:
+            if clip_el.find("near") is not None:
+                clip_el.find("near").text = "0.05"
+            if clip_el.find("far") is not None:
+                clip_el.find("far").text = "350.0"
         hfov = cam.find("camera/horizontal_fov")
         if hfov is None:
             E.SubElement(cam.find("camera"), "horizontal_fov").text = "1.5708"
         else:
             hfov.text = "1.5708"
+
+    # 13b. 360-Degree High-Rate 3D Scanning LiDAR Sensor Link & Joint
+    lidar_link = m.find("link[@name='lidar_link']")
+    if lidar_link is None:
+        lidar_link = E.SubElement(m, "link", name="lidar_link")
+        sub(lidar_link, "pose", "0 0 0.115 0 0 0")
+        l_inert = E.SubElement(lidar_link, "inertial")
+        sub(l_inert, "mass", "0.050")
+        l_iner = E.SubElement(l_inert, "inertia")
+        for ax in ["ixx", "iyy", "izz"]:
+            sub(l_iner, ax, "0.0001")
+        for ax in ["ixy", "ixz", "iyz"]:
+            sub(l_iner, ax, "0.0")
+
+        l_vis = E.SubElement(lidar_link, "visual", name="lidar_puck_visual")
+        sub(l_vis, "pose", "0 0 0 0 0 0")
+        lg = E.SubElement(l_vis, "geometry")
+        lcyl = E.SubElement(lg, "cylinder")
+        sub(lcyl, "radius", "0.038")
+        sub(lcyl, "length", "0.032")
+        lmat = E.SubElement(l_vis, "material")
+        sub(lmat, "ambient", "0.15 0.15 0.18 1")
+        sub(lmat, "diffuse", "0.25 0.25 0.30 1")
+        sub(lmat, "specular", "0.9 0.9 0.9 1")
+
+        l_ring = E.SubElement(lidar_link, "visual", name="lidar_blue_ring")
+        sub(l_ring, "pose", "0 0 0.005 0 0 0")
+        lrg = E.SubElement(l_ring, "geometry")
+        lrcyl = E.SubElement(lrg, "cylinder")
+        sub(lrcyl, "radius", "0.040")
+        sub(lrcyl, "length", "0.006")
+        lrmat = E.SubElement(l_ring, "material")
+        sub(lrmat, "ambient", "0.0 0.7 1.0 1")
+        sub(lrmat, "diffuse", "0.0 0.8 1.0 1")
+        sub(lrmat, "emissive", "0.0 0.5 0.9 1")
+
+        sensor = E.SubElement(lidar_link, "sensor", name=f"lidar_{i}", type="gpu_lidar")
+        sub(sensor, "pose", "0 0 0 0 0 0")
+        sub(sensor, "topic", f"/rescue_{i}/scan")
+        sub(sensor, "update_rate", "20")
+        ray = E.SubElement(sensor, "ray")
+        scan = E.SubElement(ray, "scan")
+        horiz = E.SubElement(scan, "horizontal")
+        sub(horiz, "samples", "360")
+        sub(horiz, "resolution", "1")
+        sub(horiz, "min_angle", "-3.14159")
+        sub(horiz, "max_angle", "3.14159")
+        vert = E.SubElement(scan, "vertical")
+        sub(vert, "samples", "16")
+        sub(vert, "resolution", "1")
+        sub(vert, "min_angle", "-0.2618")
+        sub(vert, "max_angle", "0.2618")
+        rng = E.SubElement(ray, "range")
+        sub(rng, "min", "0.15")
+        sub(rng, "max", "50.0")
+        sub(rng, "resolution", "0.01")
+        sub(sensor, "always_on", "1")
+        sub(sensor, "visualize", "true")
+
+        lidar_joint = E.SubElement(m, "joint", name="lidar_joint", type="fixed")
+        sub(lidar_joint, "parent", "base_link")
+        sub(lidar_joint, "child", "lidar_link")
 
     # 14. Emergency Medical / Humanitarian Survival Canisters (High-Visibility 5-Canister Array)
     if pkg_count == 5:
@@ -726,30 +886,7 @@ for d_spec in drone_specs:
     )
     af.write_text(text)
 
-# Equip all 10 flood survivors with high-visibility international orange SOLAS rescue vests
-for s_idx in range(1, 11):
-    s_mod = w.find(f"model[@name='survivor_{s_idx}']")
-    if s_mod is not None:
-        b_link = s_mod.find("link[@name='body']")
-        if b_link is not None:
-            if b_link.find("visual[@name='rescue_life_jacket']") is None:
-                vest = E.SubElement(b_link, "visual", name="rescue_life_jacket")
-                sub(vest, "pose", "0 0 0.45 0 0 0")
-                g = E.SubElement(vest, "geometry")
-                sub(E.SubElement(g, "box"), "size", "0.50 0.40 0.60")
-                mat = E.SubElement(vest, "material")
-                sub(mat, "ambient", "1.0 0.35 0.0 1")
-                sub(mat, "diffuse", "1.0 0.45 0.0 1")
-                sub(mat, "emissive", "0.25 0.08 0.0 1")
-
-                tape = E.SubElement(b_link, "visual", name="solas_retro_tape")
-                sub(tape, "pose", "0 0 0.65 0 0 0")
-                g_t = E.SubElement(tape, "geometry")
-                sub(E.SubElement(g_t, "box"), "size", "0.52 0.42 0.10")
-                mat_t = E.SubElement(tape, "material")
-                sub(mat_t, "ambient", "0.95 0.95 0.95 1")
-                sub(mat_t, "diffuse", "1.0 1.0 1.0 1")
-                sub(mat_t, "emissive", "0.4 0.4 0.4 1")
+# Clean Gazebo person models (no pads, no box overlays)
 
 # Ensure Gazebo GUI camera has a panoramic overview of both drones on the launch pad
 gui_elem = w.find("gui")

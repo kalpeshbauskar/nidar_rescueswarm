@@ -14,7 +14,7 @@ source /home/kalpeshbauskar/nidar_rescueswarm/ros2_ws/install/setup.bash
 source /home/kalpeshbauskar/nidar_rescueswarm/venv/bin/activate
 export YOLO_CONFIG_DIR=$PROJECT_ROOT/.yolo
 export GZ_CONFIG_PATH=/usr/share/gz${GZ_CONFIG_PATH:+:$GZ_CONFIG_PATH}
-export GZ_SIM_RESOURCE_PATH=$PROJECT_ROOT/simulation/imported/PX4-Autopilot/Tools/simulation/gz/models:/home/kalpeshbauskar/PX4-Autopilot/Tools/simulation/gz/models
+export GZ_SIM_RESOURCE_PATH=$PROJECT_ROOT/simulation/imported/PX4-Autopilot/Tools/simulation/gz/models:/home/kalpeshbauskar/PX4-Autopilot/Tools/simulation/gz/models:$PROJECT_ROOT/simulation/imported/humans
 export GZ_SIM_SYSTEM_PLUGIN_PATH=/home/kalpeshbauskar/PX4-Autopilot/build/px4_sitl_default/src/modules/simulation/gz_plugins
 export LIBGL_ALWAYS_SOFTWARE=1
 export QT_QPA_PLATFORM=xcb
@@ -28,7 +28,13 @@ export GZ_IP=127.0.0.1
 
 echo "Validating configuration..."
 python3 build_world.py
-python3 patch_wind.py 5.0 dual_rescue.sdf
+WIND_SPEED="${WIND_SPEED:-0.0}"
+if (( $(echo "$WIND_SPEED > 0.001" | bc -l) )); then
+    python3 patch_wind.py "$WIND_SPEED" dual_rescue.sdf
+    echo "Wind active: ${WIND_SPEED} m/s applied to environment."
+else
+    echo "Calm weather mode: 0.0 m/s wind (stable, level flight)."
+fi
 echo "Configuration Validated: Rev-B Heavy-Lift High-Speed (850mm)."
 
 echo "Launching Gazebo GUI..."
@@ -102,15 +108,15 @@ mkdir -p "$PROJECT_ROOT/simulation/logs"
 ros2 launch nidar_vision vision_fleet.launch.py detector:="$DETECTOR" > "$PROJECT_ROOT/simulation/logs/vision.log" 2>&1 &
 VISION_PID=$!
 
-echo "Starting NIDAR Tactical Mission Control Centre..."
-python3 "$PROJECT_ROOT/control_centre.py" > "$PROJECT_ROOT/simulation/logs/control_centre.log" 2>&1 &
-CC_PID=$!
+echo "Starting RViz2 Tactical Swarm Ground Station (LiDAR, Cameras, Speeds, Geotags, Deliveries)..."
+ros2 launch nidar_vision vision_rviz.launch.py > "$PROJECT_ROOT/simulation/logs/rviz.log" 2>&1 &
+RVIZ_PID=$!
 sleep 2
 
-if [ "${RUN_RVIZ:-0}" = "1" ]; then
-    echo "Starting RViz2 camera and detection display..."
-    ros2 launch nidar_vision vision_rviz.launch.py > "$PROJECT_ROOT/simulation/logs/rviz.log" 2>&1 &
-    RVIZ_PID=$!
+if [ "${RUN_CONTROL_CENTRE:-0}" = "1" ]; then
+    echo "Starting legacy Mission Control Centre..."
+    python3 "$PROJECT_ROOT/control_centre.py" > "$PROJECT_ROOT/simulation/logs/control_centre.log" 2>&1 &
+    CC_PID=$!
 fi
 
 echo "Starting mission controller..."
@@ -118,7 +124,7 @@ python3 mission.py &
 MISSION_PID=$!
 
 wait $MISSION_PID || true
-kill $CC_PID 2>/dev/null || true
+[ -n "$CC_PID" ] && kill $CC_PID 2>/dev/null || true
 [ -n "$RVIZ_PID" ] && kill $RVIZ_PID 2>/dev/null || true
 kill $VISION_PID 2>/dev/null || true
 echo "Mission completed. You can safely close Gazebo and QGC using ./stop_nidar_demo.sh."

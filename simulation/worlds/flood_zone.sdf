@@ -41,36 +41,86 @@
     </model>
 
     <!-- Sector 1 Survivors (Drone 1 Search Area: East in [-160, 30]) -->
-    <model name="debris_1"><static>true</static><pose>-80 -110 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_1"><static>true</static><pose>-80 -110 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_1">
+      <static>true</static>
+      <pose>-80 -110 0.05 0 0 0</pose>
+      <include merge="true">
+        <uri>model://person_walking</uri>
+      </include>
+    </model>
 
-    <model name="debris_8"><static>true</static><pose>-130 -70 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_8"><static>true</static><pose>-130 -70 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_8">
+      <static>true</static>
+      <pose>-130 -70 0.05 0 0 0.8</pose>
+      <include merge="true">
+        <uri>model://casual_female</uri>
+      </include>
+    </model>
 
-    <model name="debris_7"><static>true</static><pose>60 -130 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_7"><static>true</static><pose>60 -130 0.9 0 0 0</pose><link name="body"><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_7">
+      <static>true</static>
+      <pose>60 -130 0.05 0 0 -1.2</pose>
+      <include merge="true">
+        <uri>model://person_walking</uri>
+      </include>
+    </model>
 
-    <model name="debris_10"><static>true</static><pose>130 -90 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_10"><static>true</static><pose>130 -90 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_10">
+      <static>true</static>
+      <pose>130 -90 0.05 0 0 2.1</pose>
+      <include merge="true">
+        <uri>model://person_walking</uri>
+      </include>
+    </model>
 
-    <model name="debris_4"><static>true</static><pose>-30 -50 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_4"><static>true</static><pose>-30 -50 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Walking_person/meshes/walking.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_4">
+      <static>true</static>
+      <pose>-30 -50 0.05 0 0 1.57</pose>
+      <include merge="true">
+        <uri>model://person_walking</uri>
+      </include>
+    </model>
 
     <!-- Sector 2 Survivors (Drone 2 Search Area: East in [30, 160]) -->
-    <model name="debris_5"><static>true</static><pose>90 50 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_5"><static>true</static><pose>90 50 0.9 0 0 0</pose><link name="body"><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_5">
+      <static>true</static>
+      <pose>90 50 0.05 0 0 0.5</pose>
+      <include merge="true">
+        <uri>model://casual_female</uri>
+      </include>
+    </model>
 
-    <model name="debris_6"><static>true</static><pose>-110 60 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_6"><static>true</static><pose>-110 60 0.9 0 0 0</pose><link name="body"><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_6">
+      <static>true</static>
+      <pose>-110 60 0.05 0 0 -0.7</pose>
+      <include merge="true">
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
 
-    <model name="debris_9"><static>true</static><pose>30 80 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_9"><static>true</static><pose>30 80 0.9 0 0 0</pose><link name="body"><visual name="v"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><pose>0 0 0.8 1.5708 0 0</pose><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_9">
+      <static>true</static>
+      <pose>30 80 0.05 0 0 1.1</pose>
+      <include merge="true">
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
 
-    <model name="debris_3"><static>true</static><pose>-80 120 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_3"><static>true</static><pose>-80 120 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Standing_person/meshes/standing.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_3">
+      <static>true</static>
+      <pose>-80 120 0.05 0 0 -2.4</pose>
+      <include merge="true">
+        <uri>model://person_standing</uri>
+      </include>
+    </model>
 
-    <model name="debris_2"><static>true</static><pose>110 140 0.15 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2 2 0.3</size></box></geometry><material><ambient>0.4 0.3 0.2 1</ambient></material></visual><collision name="c"><geometry><box><size>2 2 0.3</size></box></geometry></collision></link></model>
-    <model name="survivor_2"><static>true</static><pose>110 140 0.9 0 0 0</pose><link name="body"><visual name="v"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></visual><collision name="c"><geometry><mesh><uri>file:///home/kalpeshbauskar/nidar_rescueswarm/simulation/imported/humans/Casual_female/meshes/casual_female.dae</uri></mesh></geometry></collision></link></model>
+    <model name="survivor_2">
+      <static>true</static>
+      <pose>110 140 0.05 0 0 0</pose>
+      <include merge="true">
+        <uri>model://casual_female</uri>
+      </include>
+    </model>
 <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
  <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>

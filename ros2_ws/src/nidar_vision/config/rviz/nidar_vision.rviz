@@ -5,25 +5,39 @@ Panels:
   Property Tree Widget:
     Expanded:
     - /Global Options1
-    - /Status1
-    - /Drone 0 Raw Camera1
-    - /Drone 0 SSD Detection1
-    - /Drone 0 YOLO Detection1
-    - /Drone 1 Raw Camera1
-    - /Drone 1 SSD Detection1
-    - /Drone 1 YOLO Detection1
+    - /Grid1
+    - /TF1
+    - /Swarm Tactical Markers & HUD1
+    - /Drone 1 Flight Path1
+    - /Drone 2 Flight Path1
+    - /Drone 0 LiDAR Scan1
+    - /Drone 1 LiDAR Scan1
+    - /Drone 0 3D LiDAR PointCloud1
+    - /Drone 1 3D LiDAR PointCloud1
+    - /Drone 0 SSD Detection View1
+    - /Drone 0 Raw Camera View1
+    - /Drone 1 SSD Detection View1
+    - /Drone 1 Raw Camera View1
     Splitter Ratio: 0.5
-  Tree Height: 500
+  Tree Height: 540
+- Class: rviz_common/Views
+  Help Height: 40
+  Name: Views
+  Property Tree Widget:
+    Expanded:
+    - /Current View1
+    Splitter Ratio: 0.5
+  Tree Height: 180
 Visualization Manager:
   Class: ''
   Displays:
-  - Alpha: 0.5
-    Cell Size: 1
+  - Alpha: 0.4
+    Cell Size: 10
     Class: rviz_default_plugins/Grid
-    Color: 160; 160; 164
+    Color: 140; 150; 170
     Enabled: true
     Line Style:
-      Line Width: 0.029999999329447746
+      Line Width: 0.05
       Value: Lines
     Name: Grid
     Normal Cell Count: 0
@@ -32,29 +46,231 @@ Visualization Manager:
       Y: 0
       Z: 0
     Plane: XY
-    Plane Cell Count: 10
+    Plane Cell Count: 32
     Reference Frame: <Fixed Frame>
     Value: true
-  - Class: rviz_default_plugins/Image
+  - Class: rviz_default_plugins/TF
     Enabled: true
-    Max Value: 1
-    Median window: 5
-    Min Value: 0
-    Name: Drone 0 Raw Camera
-    Normalize Range: true
+    Frame Timeout: 15
+    Frames:
+      All Enabled: true
+    Marker Scale: 1.0
+    Name: TF
+    Show Arrows: true
+    Show Axes: true
+    Show Names: true
+    Tree:
+      {}
+    Update Interval: 0
+    Value: true
+  - Class: rviz_default_plugins/MarkerArray
+    Enabled: true
+    Name: Swarm Tactical Markers & HUD
+    Namespaces:
+      {}
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /nidar/rviz_markers
+    Value: true
+  - Class: rviz_default_plugins/Path
+    Alpha: 0.95
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 255; 102; 0
+    Enabled: true
+    Head Diameter: 0.3
+    Head Color: 255; 200; 0
+    Line Style: Lines
+    Line Width: 0.35
+    Name: Drone 1 Flight Path
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Pose Color: 255; 85; 0
+    Pose Style: None
+    Radius: 0.03
+    Shaft Diameter: 0.1
+    Shaft Length: 0.1
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /drone1/flight_path
+    Value: true
+  - Class: rviz_default_plugins/Path
+    Alpha: 0.95
+    Buffer Length: 1
+    Class: rviz_default_plugins/Path
+    Color: 0; 200; 255
+    Enabled: true
+    Head Diameter: 0.3
+    Head Color: 100; 240; 255
+    Line Style: Lines
+    Line Width: 0.35
+    Name: Drone 2 Flight Path
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Pose Color: 0; 180; 255
+    Pose Style: None
+    Radius: 0.03
+    Shaft Diameter: 0.1
+    Shaft Length: 0.1
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /drone2/flight_path
+    Value: true
+  - Alpha: 1.0
+    Autocompute Intensity Bounds: true
+    Autocompute Value Bounds:
+      Max Value: 10
+      Min Value: -10
+      Value: true
+    Axis: Z
+    Channel Name: intensity
+    Class: rviz_default_plugins/LaserScan
+    Color: 255; 140; 0
+    Color Transformer: FlatColor
+    Decay Time: 0.05
+    Enabled: true
+    Invert Rainbow: false
+    Max Color: 255; 255; 255
+    Max Intensity: 4096
+    Min Color: 0; 0; 0
+    Min Intensity: 0
+    Name: Drone 0 LiDAR Scan
+    Position Transformer: XYZ
+    Queue Size: 10
+    Selectable: true
+    Size (Pixels): 4
+    Size (m): 0.25
+    Style: Flat Squares
     Topic:
       Depth and Reliability: false
       Durability Policy: Volatile
       History Policy: Keep Last
       Reliability Policy: System Default
-      Value: /rescue_0/camera/image_raw
+      Value: /rescue_0/scan
+    Use Fixed Frame: true
+    Use rainbow: true
+    Value: true
+  - Alpha: 1.0
+    Autocompute Intensity Bounds: true
+    Autocompute Value Bounds:
+      Max Value: 10
+      Min Value: -10
+      Value: true
+    Axis: Z
+    Channel Name: intensity
+    Class: rviz_default_plugins/LaserScan
+    Color: 0; 210; 255
+    Color Transformer: FlatColor
+    Decay Time: 0.05
+    Enabled: true
+    Invert Rainbow: false
+    Max Color: 255; 255; 255
+    Max Intensity: 4096
+    Min Color: 0; 0; 0
+    Min Intensity: 0
+    Name: Drone 1 LiDAR Scan
+    Position Transformer: XYZ
+    Queue Size: 10
+    Selectable: true
+    Size (Pixels): 4
+    Size (m): 0.25
+    Style: Flat Squares
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_1/scan
+    Use Fixed Frame: true
+    Use rainbow: true
+    Value: true
+  - Alpha: 0.85
+    Autocompute Intensity Bounds: true
+    Autocompute Value Bounds:
+      Max Value: 10
+      Min Value: -10
+      Value: true
+    Axis: Z
+    Channel Name: intensity
+    Class: rviz_default_plugins/PointCloud2
+    Color: 255; 165; 0
+    Color Transformer: AxisColor
+    Decay Time: 0.05
+    Enabled: true
+    Invert Rainbow: false
+    Max Color: 255; 255; 255
+    Max Intensity: 4096
+    Min Color: 0; 0; 0
+    Min Intensity: 0
+    Name: Drone 0 3D LiDAR PointCloud
+    Position Transformer: XYZ
+    Queue Size: 10
+    Selectable: true
+    Size (Pixels): 3
+    Size (m): 0.12
+    Style: Points
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_0/scan/points
+    Use Fixed Frame: true
+    Use rainbow: true
+    Value: true
+  - Alpha: 0.85
+    Autocompute Intensity Bounds: true
+    Autocompute Value Bounds:
+      Max Value: 10
+      Min Value: -10
+      Value: true
+    Axis: Z
+    Channel Name: intensity
+    Class: rviz_default_plugins/PointCloud2
+    Color: 0; 220; 255
+    Color Transformer: AxisColor
+    Decay Time: 0.05
+    Enabled: true
+    Invert Rainbow: false
+    Max Color: 255; 255; 255
+    Max Intensity: 4096
+    Min Color: 0; 0; 0
+    Min Intensity: 0
+    Name: Drone 1 3D LiDAR PointCloud
+    Position Transformer: XYZ
+    Queue Size: 10
+    Selectable: true
+    Size (Pixels): 3
+    Size (m): 0.12
+    Style: Points
+    Topic:
+      Depth and Reliability: false
+      Durability Policy: Volatile
+      History Policy: Keep Last
+      Reliability Policy: System Default
+      Value: /rescue_1/scan/points
+    Use Fixed Frame: true
+    Use rainbow: true
     Value: true
   - Class: rviz_default_plugins/Image
     Enabled: true
     Max Value: 1
     Median window: 5
     Min Value: 0
-    Name: Drone 0 SSD Detection
+    Name: Drone 0 SSD Detection View
     Normalize Range: true
     Topic:
       Depth and Reliability: false
@@ -68,35 +284,21 @@ Visualization Manager:
     Max Value: 1
     Median window: 5
     Min Value: 0
-    Name: Drone 0 YOLO Detection
+    Name: Drone 0 Raw Camera View
     Normalize Range: true
     Topic:
       Depth and Reliability: false
       Durability Policy: Volatile
       History Policy: Keep Last
       Reliability Policy: System Default
-      Value: /rescue_0/yolo/image_annotated
+      Value: /rescue_0/camera/image_raw
     Value: true
   - Class: rviz_default_plugins/Image
     Enabled: true
     Max Value: 1
     Median window: 5
     Min Value: 0
-    Name: Drone 1 Raw Camera
-    Normalize Range: true
-    Topic:
-      Depth and Reliability: false
-      Durability Policy: Volatile
-      History Policy: Keep Last
-      Reliability Policy: System Default
-      Value: /rescue_1/camera/image_raw
-    Value: true
-  - Class: rviz_default_plugins/Image
-    Enabled: true
-    Max Value: 1
-    Median window: 5
-    Min Value: 0
-    Name: Drone 1 SSD Detection
+    Name: Drone 1 SSD Detection View
     Normalize Range: true
     Topic:
       Depth and Reliability: false
@@ -110,18 +312,18 @@ Visualization Manager:
     Max Value: 1
     Median window: 5
     Min Value: 0
-    Name: Drone 1 YOLO Detection
+    Name: Drone 1 Raw Camera View
     Normalize Range: true
     Topic:
       Depth and Reliability: false
       Durability Policy: Volatile
       History Policy: Keep Last
       Reliability Policy: System Default
-      Value: /rescue_1/yolo/image_annotated
+      Value: /rescue_1/camera/image_raw
     Value: true
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 20; 24; 32
     Fixed Frame: world
     Frame Rate: 30
   Name: root
@@ -134,17 +336,33 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
+      Distance: 110.0
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 6
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
       Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.65
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
+      Yaw: 0.78
     Saved: null
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 800
+  Height: 900
   Hide Left Dock: false
   Hide Right Dock: false
   QMainWindow State: null
-  Width: 1200
-  X: 100
-  Y: 100
+  Width: 1400
+  X: 80
+  Y: 60

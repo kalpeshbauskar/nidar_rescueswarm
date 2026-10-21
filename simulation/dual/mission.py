@@ -374,8 +374,12 @@ class Drone(RosNode):
                     'drone': d.get('drone', self.i + 1),
                     'north': d.get('north'),
                     'east': d.get('east'),
+                    'lat': round(LAT + (float(d.get('north', 0.0)) / R) * (180.0 / math.pi), 6),
+                    'lon': round(LON + (float(d.get('east', 0.0)) / (R * math.cos(math.radians(LAT)))) * (180.0 / math.pi), 6),
                     'release_north': d.get('release_north'),
                     'release_east': d.get('release_east'),
+                    'release_lat': round(LAT + (float(d.get('release_north', 0.0)) / R) * (180.0 / math.pi), 6),
+                    'release_lon': round(LON + (float(d.get('release_east', 0.0)) / (R * math.cos(math.radians(LAT)))) * (180.0 / math.pi), 6),
                     'release_altitude': d.get('release_altitude'),
                     'radial_error_m': round(float(math.hypot(d.get('release_north', 0.0) - d.get('north', 0.0), d.get('release_east', 0.0) - d.get('east', 0.0))), 2),
                     'elapsed': round(d.get('elapsed', 0.0), 1),
@@ -388,6 +392,8 @@ class Drone(RosNode):
                         'id': idx,
                         'north': round(float(det['n']), 2),
                         'east': round(float(det['e']), 2),
+                        'lat': round(LAT + (float(det['n']) / R) * (180.0 / math.pi), 6),
+                        'lon': round(LON + (float(det['e']) / (R * math.cos(math.radians(LAT)))) * (180.0 / math.pi), 6),
                         'hits': det.get('hits', 0),
                         'delivered': det.get('delivered', False),
                     } for idx, det in enumerate(self.detections)
@@ -480,7 +486,7 @@ class Drone(RosNode):
         if self.phase not in ['SEARCH', 'APPROACH', 'DESCEND', 'RELEASE']:
             return
             
-        w, h = getattr(self, 'img_w', 960), getattr(self, 'img_h', 720)
+        w, h = getattr(self, 'img_w', 1280), getattr(self, 'img_h', 960)
         
         for det in msg.detections:
             u = det.bbox.center.position.x
@@ -498,20 +504,28 @@ class Drone(RosNode):
             if area < MIN_BOX_AREA_PX or area > MAX_BOX_AREA_PX:
                 continue
             
-            point = self.project(u, v, w, h, 0.9)
+            point = self.project(u, v, w, h, 0.5)
             if point is None:
                 continue
             n, e = map(float, point[:2])
-            if not (self.z['east_min'] <= e <= self.z['east_max'] and -156.25 <= n <= 156.25):
+            # Field bounds check (-175m to +175m) allows relocated survivors anywhere across the disaster area
+            if not (-175.0 <= e <= 175.0 and -175.0 <= n <= 175.0):
                 continue
 
-            # Home exclusion zone: reject any detection within 35m of launch pad
-            if self.home is not None and math.hypot(n - self.home[0], e - self.home[1]) < 35.0:
+            # Home exclusion zone: reject only within 12m of launch pad
+            if self.home is not None and math.hypot(n - self.home[0], e - self.home[1]) < 12.0:
                 continue
 
             with self.lock:
-                # Check if this detection is near an already-completed drop
-                already_delivered = any(math.hypot(drop['north'] - n, drop['east'] - e) < 25.0 for drop in self.drops)
+                # Check if this detection is near an already-completed drop by this drone or peer drone
+                already_delivered = any(math.hypot(drop['north'] - n, drop['east'] - e) < 22.0 for drop in self.drops)
+                if not already_delivered:
+                    for pid, p_state in self.peer_states.items():
+                        lr = p_state.get('latest_release')
+                        if lr and lr.get('survivor_north_m') is not None:
+                            if math.hypot(lr['survivor_north_m'] - n, lr['survivor_east_m'] - e) < 22.0:
+                                already_delivered = True
+                                break
 
                 distances = [math.hypot(d['n'] - n, d['e'] - e) for d in self.detections]
                 k = int(np.argmin(distances)) if distances else -1
@@ -543,7 +557,9 @@ class Drone(RosNode):
                 
                 # Wait for N consecutive frames of confidence equivalent
                 if d['hits'] == MIN_CONSECUTIVE_FRAMES and not d['delivered']:
-                    self.event('camera_detection', target=k, north=d['n'], east=d['e'], method='yolo')
+                    det_lat = LAT + (d['n'] / R) * (180.0 / math.pi)
+                    det_lon = LON + (d['e'] / (R * math.cos(math.radians(LAT)))) * (180.0 / math.pi)
+                    self.event('camera_detection', target=k, north=d['n'], east=d['e'], lat=round(det_lat, 6), lon=round(det_lon, 6), method='ssd')
 
     def cargo_send(self, j, action):
         for _ in range(3):
@@ -592,7 +608,15 @@ class Drone(RosNode):
         s.position = list(self.target - self.offset)
         s.velocity = [math.nan] * 3
         s.acceleration = [math.nan] * 3
-        s.yaw = 0.0
+
+        # Align heading with flight path when cruising/searching to fly forward rather than crabbing sideways
+        if hasattr(self, 'target') and self.target is not None and self.global_p is not None:
+            dn = float(self.target[0] - self.global_p[0])
+            de = float(self.target[1] - self.global_p[1])
+            dist_h = math.hypot(dn, de)
+            if dist_h > 1.5 and self.phase in ['TRANSIT', 'SEARCH', 'APPROACH', 'RETURN']:
+                self.target_yaw = math.atan2(de, dn)
+        s.yaw = getattr(self, 'target_yaw', 0.0)
         s.yawspeed = math.nan
         self.sp.publish(s)
 
@@ -745,6 +769,13 @@ class Drone(RosNode):
             (OUT / f'drone{self.i+1}-status.json').write_text(json.dumps(self.status(), indent=2))
 
         if self.phase == 'WAIT':
+            if not hasattr(self, '_last_wait_diag') or now - self._last_wait_diag >= 10.0:
+                self._last_wait_diag = now
+                pos_ok = (self.global_p is not None and self.p.xy_valid and self.p.z_valid) if self.p else False
+                status_ok = self.s is not None
+                att_ok = self.att is not None
+                print(f"[PREFLIGHT Drone {self.i+1}] Elapsed: {now - self.start:.1f}s/90s | Pos valid: {pos_ok} | Status: {status_ok} | Attitude: {att_ok} | Camera frames: {self.frames}/5", flush=True)
+
             if self.global_p is not None and self.s and self.p.xy_valid and self.p.z_valid and self.att is not None and self.frames > 5:
                 self.home = self.global_p.copy()
                 self.pickup_ok = True
@@ -856,8 +887,16 @@ class Drone(RosNode):
                         return
                 if self.arrived(tolerance=1.0, dwell=0.15, speed=1.5):
                     self.index += 1
-                    self.event('sweep_point', completed=self.index, total=len(self.route))
-                    if self.index >= len(self.route) or self.packages_used >= self.packages_total:
+                    if self.index >= len(self.route):
+                        if self.packages_used < self.packages_total and getattr(self, 'battery_integrator', None) and self.battery_integrator.usable_energy_remaining_wh > 80.0:
+                            print(f"[SEARCH RESUME] Route finished but {self.packages_total - self.packages_used} packages remain. Reversing sweep pass...")
+                            self.route.reverse()
+                            self.index = 0
+                            self.set_target(*self.route[0], 25)
+                        else:
+                            self.set_target(self.home[0], self.home[1], 25)
+                            self.phase_to('RETURN')
+                    elif self.packages_used >= self.packages_total:
                         self.set_target(self.home[0], self.home[1], 25)
                         self.phase_to('RETURN')
                     else:
@@ -865,14 +904,20 @@ class Drone(RosNode):
             elif self.phase == 'APPROACH':
                 if self.arrived():
                     d = self.detections[self.target_id]
-                    # Descend to 3.0m altitude with wind drift compensation (-2.5m North for 5.0m/s wind)
-                    self.set_target(d['n'] - 2.5, d['e'], 3.0)
+                    wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
+                    wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
+                    self.set_target(d['n'] + wind_n_comp, d['e'], 3.0)
                     self.phase_to('DESCEND')
             elif self.phase == 'DESCEND':
                 if self.arrived(dwell=0.8, speed=0.5):
                     d = self.detections[self.target_id]
-                    print(f"[DELIVERY] Arrived at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f}). Offsetting setpoint N={d['n']-2.5:.1f} for 5m/s wind...")
-                    self.set_target(d['n'] - 2.5, d['e'], 3.0)
+                    wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
+                    wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
+                    if wind_speed > 0:
+                        print(f"[DELIVERY] Arrived at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f}). Offsetting setpoint N={d['n']+wind_n_comp:.1f} for {wind_speed}m/s wind...")
+                    else:
+                        print(f"[DELIVERY] Arrived at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f}). Pinpoint precision drop directly overhead.")
+                    self.set_target(d['n'] + wind_n_comp, d['e'], 3.0)
                     self.phase_to('RELEASE')
             elif self.phase == 'RELEASE':
                 d = self.detections[self.target_id]
@@ -953,7 +998,7 @@ def main():
 
     def poses(msg):
         for p in msg.pose:
-            if p.name.startswith(('parcel_', 'rescue_')):
+            if p.name.startswith(('parcel_', 'rescue_', 'survivor_')):
                 truth[p.name] = [p.position.x, p.position.y, p.position.z]
 
     gz.subscribe(Pose_V, '/world/dual_rescue/dynamic_pose/info', poses)
