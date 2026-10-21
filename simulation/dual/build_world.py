@@ -641,6 +641,14 @@ for d_spec in drone_specs:
             if clip_el.find("far") is not None:
                 clip_el.find("far").text = "350.0"
         hfov = cam.find("camera/horizontal_fov")
+        if cam.find("gz_frame_id") is None:
+            sub(cam, "gz_frame_id", f"rescue_{i}/camera_link")
+        else:
+            cam.find("gz_frame_id").text = f"rescue_{i}/camera_link"
+        if cam.find("frame_id") is None:
+            sub(cam, "frame_id", f"rescue_{i}/camera_link")
+        else:
+            cam.find("frame_id").text = f"rescue_{i}/camera_link"
         if hfov is None:
             E.SubElement(cam.find("camera"), "horizontal_fov").text = "1.5708"
         else:
@@ -685,6 +693,9 @@ for d_spec in drone_specs:
         sub(sensor, "pose", "0 0 0 0 0 0")
         sub(sensor, "topic", f"/rescue_{i}/scan")
         sub(sensor, "update_rate", "20")
+        sub(sensor, "gz_frame_id", f"rescue_{i}/lidar_link")
+        sub(sensor, "frame_id", f"rescue_{i}/lidar_link")
+        sub(sensor, "ign_frame_id", f"rescue_{i}/lidar_link")
         ray = E.SubElement(sensor, "ray")
         scan = E.SubElement(ray, "scan")
         horiz = E.SubElement(scan, "horizontal")

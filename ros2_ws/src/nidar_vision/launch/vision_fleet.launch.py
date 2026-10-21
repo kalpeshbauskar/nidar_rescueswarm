@@ -28,8 +28,12 @@ def generate_launch_description():
         arguments=[
             '/rescue_0/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
             '/rescue_0/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '/rescue_0/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
+            '/rescue_0/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
+            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'
         ],
+        parameters=[{
+            'override_timestamps_with_wall_time': True
+        }],
         output='screen'
     )
     
@@ -74,6 +78,9 @@ def generate_launch_description():
             '/rescue_1/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '/rescue_1/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
         ],
+        parameters=[{
+            'override_timestamps_with_wall_time': True
+        }],
         output='screen'
     )
 
