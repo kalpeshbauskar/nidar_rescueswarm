@@ -17,7 +17,7 @@
         5,
         5
       ],
-      "max_fleet_auw_kg": 12.3,
+      "max_fleet_auw_kg": 25.0,
       "max_mission_time_sec": 1800,
       "drones": [
         {

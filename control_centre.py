@@ -606,8 +606,8 @@ class HudRenderer:
         try:
             h, w = frame.shape[:2]
             cx, cy = w // 2, h // 2
-            # 90 deg HFOV -> ~73.7 deg VFOV (4:3 aspect)
-            pixels_per_deg_v = h / 73.7
+            # 63 deg HFOV -> ~49.4 deg VFOV (4:3 aspect)
+            pixels_per_deg_v = h / 49.4
             # Clamp stabilization range to +-15 deg to avoid severe border artifacts
             c_roll = max(-15.0, min(15.0, float(roll)))
             c_pitch = max(-15.0, min(15.0, float(pitch)))

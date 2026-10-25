@@ -729,8 +729,10 @@ class RvizTelemetryNode(Node):
             # Projected ground footprint at Z=0.05
             h_alt = drone.alt_agl
             y_ctr = drone.rviz_y + 0.268 * h_alt
-            w_fov = max(1.0, 1.0 * h_alt)
-            l_fov = max(1.0, 0.75 * h_alt)
+            # Half-width/half-length of the 63 deg HFOV, 4:3 footprint
+            half_w = math.tan(math.radians(63.0) / 2)
+            w_fov = max(1.0, half_w * h_alt)
+            l_fov = max(1.0, 0.75 * half_w * h_alt)
 
             m_frustum = Marker()
             m_frustum.header.stamp = stamp

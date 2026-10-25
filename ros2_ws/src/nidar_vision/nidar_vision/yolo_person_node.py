@@ -46,7 +46,7 @@ def rotation_matrix(q):
     ])
 
 
-def forward_project(target_ned, global_p, att_q, w=1280, h=960, cam_hfov=1.5708):
+def forward_project(target_ned, global_p, att_q, w=1280, h=960, cam_hfov=math.radians(63.0)):
     f = w / (2.0 * math.tan(cam_hfov / 2.0))
     rot = rotation_matrix(att_q)
     origin = global_p + rot @ np.array([0.15, 0.0, -0.06])

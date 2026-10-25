@@ -49,7 +49,7 @@ def rotation_matrix(q):
     ])
 
 
-def forward_project(target_ned, global_p, att_q, w=1280, h=960, cam_hfov=1.5708):
+def forward_project(target_ned, global_p, att_q, w=1280, h=960, cam_hfov=math.radians(63.0)):
     """
     Projects a 3D world target point (in NED meters) into the 2D image plane (cx, cy).
     Matches the exact optical geometry of the downward camera (15 deg forward pitch).
