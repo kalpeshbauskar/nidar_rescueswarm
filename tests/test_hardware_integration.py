@@ -59,8 +59,8 @@ class TestHardwareIntegration:
             dry_mass = get_drone_dry_mass_kg(drone_id)
             initial_auw = get_drone_initial_auw_kg(drone_id)
 
-            assert dry_mass > 4.5, f"Dry mass too low: {dry_mass} kg"
-            assert dry_mass < 7.0, f"Dry mass too high: {dry_mass} kg"
+            assert dry_mass > 6.5, f"Dry mass too low: {dry_mass} kg"
+            assert dry_mass < 7.5, f"Dry mass too high: {dry_mass} kg"
             assert initial_auw > dry_mass
             expected_payload = PAYLOAD_ALLOCATION[drone_id] * PACKAGE_MASS_KG
             assert math.isclose(initial_auw, dry_mass + expected_payload, rel_tol=1e-4)
@@ -103,8 +103,8 @@ class TestHardwareIntegration:
         """Test maximum combined fleet AUW is strictly <= 25 kg."""
         fleet_auw = get_fleet_initial_auw_kg()
         assert fleet_auw <= MAX_FLEET_AUW_KG, f"Fleet AUW {fleet_auw} kg exceeds {MAX_FLEET_AUW_KG} kg limit"
-        # Check specific calculated value: ~18.8 kg
-        assert 12.0 <= fleet_auw <= 13.0
+        # Check specific calculated value: 2 x 8.143 kg = ~16.3 kg
+        assert 16.0 <= fleet_auw <= 16.6
 
     def test_06_thrust_to_weight_ratio(self):
         """Test T/W ratio >= 1.5 across all drones at both initial AUW and empty payload."""
@@ -144,10 +144,10 @@ class TestHardwareIntegration:
             assert elec.wiring_capacity_ok is True
 
     def test_08_battery_energy_and_reserve_separation(self):
-        """Test nominal energy (266.4 Wh), 80% usable (213.12 Wh), and 20% reserve (53.28 Wh)."""
-        assert math.isclose(BATTERY_SPECS.nominal_energy_wh, 355.2, rel_tol=1e-4)
-        assert math.isclose(BATTERY_SPECS.usable_energy_wh, 284.16, rel_tol=1e-4)
-        assert math.isclose(BATTERY_SPECS.reserve_energy_wh, 71.04, rel_tol=1e-4)
+        """Test nominal energy (488.4 Wh), 80% usable (390.72 Wh), and 20% reserve (97.68 Wh)."""
+        assert math.isclose(BATTERY_SPECS.nominal_energy_wh, 488.4, rel_tol=1e-4)
+        assert math.isclose(BATTERY_SPECS.usable_energy_wh, 390.72, rel_tol=1e-4)
+        assert math.isclose(BATTERY_SPECS.reserve_energy_wh, 97.68, rel_tol=1e-4)
         assert math.isclose(
             BATTERY_SPECS.usable_energy_wh + BATTERY_SPECS.reserve_energy_wh,
             BATTERY_SPECS.nominal_energy_wh,
@@ -187,7 +187,7 @@ class TestHardwareIntegration:
         """
         integrator = BatterySOCIntegrator(drone_id=0)
 
-        # Case A: 15-minute mission, 180 Wh consumed (within 213.12 Wh usable) -> VALID
+        # Case A: 15-minute mission, 180 Wh consumed (within 390.72 Wh usable) -> VALID
         integrator.energy_consumed_wh = 180.0
         valid, msg = integrator.validate_mission_energy(total_mission_time_sec=15 * 60.0)
         assert valid is True
@@ -198,8 +198,8 @@ class TestHardwareIntegration:
         assert valid is False
         assert "30 minute maximum" in msg
 
-        # Case C: 20-minute mission, but consumed 230 Wh (> 213.12 Wh usable, breached reserve) -> INVALID
-        integrator.energy_consumed_wh = 300.0
+        # Case C: 20-minute mission, but consumed 400 Wh (> 390.72 Wh usable, breached reserve) -> INVALID
+        integrator.energy_consumed_wh = 400.0
         valid, msg = integrator.validate_mission_energy(total_mission_time_sec=20 * 60.0)
         assert valid is False
         assert "reserve breached" in msg

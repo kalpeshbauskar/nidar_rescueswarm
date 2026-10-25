@@ -442,7 +442,7 @@ class Drone(RosNode):
     def project(self, cx, cy, width, height, plane):
         if self.global_p is None or self.att is None:
             return None
-        CAM_HFOV = 1.5708
+        CAM_HFOV = math.radians(63.0)  # Arducam IMX477 + 6 mm lens, must match build_world.py
         f = width / (2 * math.tan(CAM_HFOV / 2))
         
         # Ray in camera optical sensor frame (cy down, cx right, z forward along bore)

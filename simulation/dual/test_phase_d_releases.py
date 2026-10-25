@@ -145,9 +145,10 @@ def compute_physical_cg_and_inertia(d_idx: int, attached_bays: List[int]) -> Tup
         if pkg_count_total > 2
         else HARDWARE_BOM["payload_drop_rack_2slot"].mass_kg
     )
-    cam_mass = HARDWARE_BOM["oak_d_lite"].mass_kg
+    cam_mass = HARDWARE_BOM["camera"].mass_kg
+    lidar_mass = HARDWARE_BOM["lidar"].mass_kg
     rotor_mass = HARDWARE_BOM["propellers"].mass_kg / 4.0
-    base_mass = dry_mass - (rack_mass + cam_mass + 4 * rotor_mass)
+    base_mass = dry_mass - (rack_mass + cam_mass + lidar_mass + 4 * rotor_mass)
 
     # Component locations relative to base_link
     # base_link: (0, 0, 0)

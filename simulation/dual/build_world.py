@@ -16,6 +16,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from simulation.hardware.config import (
     FLEET_SIZE,
     HARDWARE_BOM,
+    MAX_THRUST_PER_MOTOR_KGF,
     PACKAGE_MASS_KG,
     PAYLOAD_ALLOCATION,
     TOTAL_PACKAGES,
@@ -37,6 +38,24 @@ drone_specs = profile.get("drones", [
 ])
 
 PKG_MASS = cfg.get("package_mass_kg", PACKAGE_MASS_KG)
+
+# Rev-B XL airframe: 1,050 mm motor-to-motor diagonal for 23in (585 mm) A6-M props,
+# giving 157 mm tip-to-tip clearance and keeping the inner prop tip clear of the canopy.
+WHEELBASE_M = 1.050
+ROTOR_XY = round(WHEELBASE_M / 2 / math.sqrt(2), 4)   # 0.3712 m in X and Y
+ARM_RADIUS_M = WHEELBASE_M / 2                          # 0.525 m centre to motor
+PROP_DIAMETER_M = 0.585
+ARM_MASS_KG = 0.396                                     # 4x 430 mm arm tubes, part of HARDWARE_BOM["frame"]
+
+# MulticopterMotorModel: thrust = motorConstant * omega^2, calibrated so 1000 rad/s gives
+# the A6-M 6.0 kgf peak (24 kgf total). Larger 23in rotors spin up slower than the old 13in.
+MAX_ROT_VELOCITY = 1000.0
+MOTOR_CONSTANT = MAX_THRUST_PER_MOTOR_KGF * 9.80665 / MAX_ROT_VELOCITY**2
+MOTOR_TIME_CONSTANT_UP = 0.025
+MOTOR_TIME_CONSTANT_DOWN = 0.050
+
+# Arducam IMX477 HQ with 6 mm CS lens: 63 deg horizontal FOV (30.6 m swath at 25 m vs 20 m lanes)
+CAM_HFOV_RAD = round(math.radians(63.0), 4)
 
 # Package inertia for emergency medical / survival canister (0.068m dia x 0.110m cylinder)
 cr, ch = 0.034, 0.110
@@ -159,17 +178,25 @@ for d_spec in drone_specs:
         if pkg_count > 2
         else HARDWARE_BOM["payload_drop_rack_2slot"].mass_kg
     )
-    cam_mass = HARDWARE_BOM["oak_d_lite"].mass_kg
-    gimbal_mass = HARDWARE_BOM["gimbal"].mass_kg if "gimbal" in HARDWARE_BOM else 0.065
+    cam_mass = HARDWARE_BOM["camera"].mass_kg
+    lidar_mass = HARDWARE_BOM["lidar"].mass_kg
     rotor_mass = HARDWARE_BOM["propellers"].mass_kg / 4.0
-    base_mass = round(dry_mass - (rack_mass + cam_mass + gimbal_mass + 4 * rotor_mass), 4)
+    # Every link's mass comes out of dry_mass so the SDF total equals the hardware config
+    base_mass = round(dry_mass - (rack_mass + cam_mass + lidar_mass + 4 * rotor_mass), 4)
 
-    # Set base_link mass and scale inertia
+    # base_link inertia: motors+ESCs as point masses at the arm tips, arms as rods
+    # from 0.10 m to the motor, everything else as the 0.38 x 0.34 x 0.12 m core box
     base_link = m.find("link[@name='base_link']")
     base_link.find("inertial/mass").text = str(base_mass)
-    scale = (base_mass / 3.2) * (0.850 / 0.710) ** 2
-    for axis, orig_val in [("ixx", 0.077), ("iyy", 0.077), ("izz", 0.133)]:
-        base_link.find(f"inertial/inertia/{axis}").text = str(round(orig_val * scale, 6))
+    motor_mass = HARDWARE_BOM["motors"].mass_kg
+    core_mass = base_mass - motor_mass - ARM_MASS_KG
+    r_in, r_out = 0.10, ARM_RADIUS_M
+    arm_r2 = (r_out**3 - r_in**3) / (3 * (r_out - r_in))
+    izz = motor_mass * r_out**2 + ARM_MASS_KG * arm_r2 + core_mass * (0.38**2 + 0.34**2) / 12
+    ixx = motor_mass * r_out**2 / 2 + ARM_MASS_KG * arm_r2 / 2 + core_mass * (0.34**2 + 0.12**2) / 12
+    iyy = motor_mass * r_out**2 / 2 + ARM_MASS_KG * arm_r2 / 2 + core_mass * (0.38**2 + 0.12**2) / 12
+    for axis, val in [("ixx", ixx), ("iyy", iyy), ("izz", izz)]:
+        base_link.find(f"inertial/inertia/{axis}").text = str(round(val, 6))
 
     # Remove all untextured, dark, or legacy visuals from base_link
     for vname in [
@@ -261,28 +288,30 @@ for d_spec in drone_specs:
     sub(mat, "diffuse", "1.0 1.0 1.0 1")
     sub(mat, "specular", "0.8 0.8 0.8 1")
 
-    # 6. Heavy-Duty 850mm Carbon-Fiber Arms (42mm x 32mm structural carbon tubes)
+    # 6. Heavy-Duty 1,050mm Carbon-Fiber Arms (42mm x 32mm structural carbon tubes)
+    a = ROTOR_XY / 2
     for arm_idx, (ax, ay, yaw) in enumerate([
-        (0.150, -0.150, -0.7854),
-        (-0.150, 0.150, -0.7854),
-        (0.150, 0.150, 0.7854),
-        (-0.150, -0.150, 0.7854),
+        (a, -a, -0.7854),
+        (-a, a, -0.7854),
+        (a, a, 0.7854),
+        (-a, -a, 0.7854),
     ]):
         arm_v = E.SubElement(base_link, "visual", name=f"cf_arm_{arm_idx}")
         sub(arm_v, "pose", f"{ax} {ay} 0.025 0 0 {yaw}")
         g = E.SubElement(arm_v, "geometry")
-        sub(E.SubElement(g, "box"), "size", "0.435 0.042 0.032")
+        sub(E.SubElement(g, "box"), "size", f"{ARM_RADIUS_M + 0.010:.3f} 0.042 0.032")
         mat = E.SubElement(arm_v, "material")
         sub(mat, "ambient", "0.26 0.26 0.30 1")
         sub(mat, "diffuse", "0.34 0.34 0.38 1")
         sub(mat, "specular", "0.6 0.6 0.6 1")
 
     # 7. Safety Warning Arm Identification Sleeves
+    sl = round(0.8 * ROTOR_XY, 4)
     for s_idx, (sx, sy, syaw, s_color) in enumerate([
-        (0.24, -0.24, -0.7854, "1.0 0.85 0.0 1"), # Front Left Yellow
-        (0.24, 0.24, 0.7854, "1.0 0.85 0.0 1"),   # Front Right Yellow
-        (-0.24, 0.24, -0.7854, "1.0 0.20 0.20 1"), # Rear Right Red
-        (-0.24, -0.24, 0.7854, "1.0 0.20 0.20 1"), # Rear Left Red
+        (sl, -sl, -0.7854, "1.0 0.85 0.0 1"), # Front Left Yellow
+        (sl, sl, 0.7854, "1.0 0.85 0.0 1"),   # Front Right Yellow
+        (-sl, sl, -0.7854, "1.0 0.20 0.20 1"), # Rear Right Red
+        (-sl, -sl, 0.7854, "1.0 0.20 0.20 1"), # Rear Left Red
     ]):
         sleeve = E.SubElement(base_link, "visual", name=f"arm_safety_sleeve_{s_idx}")
         sub(sleeve, "pose", f"{sx} {sy} 0.025 0 0 {syaw}")
@@ -292,8 +321,9 @@ for d_spec in drone_specs:
         sub(mat, "ambient", s_color)
         sub(mat, "diffuse", s_color)
 
-    # 8. Heavy-Lift Motor Nacelles & Bells at (±0.300, ±0.300)
-    for m_idx, (mx, my) in enumerate([(0.300, -0.300), (-0.300, 0.300), (0.300, 0.300), (-0.300, -0.300)]):
+    # 8. A6-M Motor Nacelles (integrated FOC ESC) & Bells at (±ROTOR_XY, ±ROTOR_XY)
+    rxy = ROTOR_XY
+    for m_idx, (mx, my) in enumerate([(rxy, -rxy), (-rxy, rxy), (rxy, rxy), (-rxy, -rxy)]):
         mpod = E.SubElement(base_link, "visual", name=f"heavy_motor_pod_{m_idx}")
         sub(mpod, "pose", f"{mx} {my} 0.035 0 0 0")
         g = E.SubElement(mpod, "geometry")
@@ -318,10 +348,10 @@ for d_spec in drone_specs:
 
     # 9. Ultra-Bright Navigation Beacon Pods (Front=Green, Rear=Red with Emissive Glow)
     for led_idx, (lx, ly, led_color) in enumerate([
-        (0.300, 0.300, "0.0 1.0 0.3 1"),   # Front Right (Green)
-        (0.300, -0.300, "0.0 1.0 0.3 1"),  # Front Left (Green)
-        (-0.300, 0.300, "1.0 0.1 0.1 1"),  # Rear Right (Red)
-        (-0.300, -0.300, "1.0 0.1 0.1 1"), # Rear Left (Red)
+        (rxy, rxy, "0.0 1.0 0.3 1"),   # Front Right (Green)
+        (rxy, -rxy, "0.0 1.0 0.3 1"),  # Front Left (Green)
+        (-rxy, rxy, "1.0 0.1 0.1 1"),  # Rear Right (Red)
+        (-rxy, -rxy, "1.0 0.1 0.1 1"), # Rear Left (Red)
     ]):
         led = E.SubElement(base_link, "visual", name=f"nav_led_{led_idx}")
         sub(led, "pose", f"{lx} {ly} 0.068 0 0 0")
@@ -448,11 +478,15 @@ for d_spec in drone_specs:
             sub(m_led, "diffuse", "0.0 1.0 0.2 1")
             sub(m_led, "emissive", "0.0 0.8 0.2 1")
 
-    # 12. Rotor Links & 13-Inch Spinning Propeller Blades with High-Visibility White Tips
+    # 12. Rotor Links & 23-Inch MF2311P Propeller Blades with High-Visibility White Tips
+    # Blade inertia as a thin rod of length PROP_DIAMETER_M spinning about z
+    blade_i = rotor_mass * PROP_DIAMETER_M**2 / 12
     for r in range(4):
         rl = m.find(f"link[@name='rotor_{r}']")
         if rl is not None:
             rl.find("inertial/mass").text = str(rotor_mass)
+            for axis, val in [("ixx", rotor_mass * 0.05**2 / 12), ("iyy", blade_i), ("izz", blade_i)]:
+                rl.find(f"inertial/inertia/{axis}").text = f"{val:.6e}"
             for old_v in list(rl.findall("visual")):
                 rl.remove(old_v)
 
@@ -469,13 +503,14 @@ for d_spec in drone_specs:
             pv = E.SubElement(rl, "visual", name=f"prop_blade_{r}")
             sub(pv, "pose", "0 0 0.010 0 0 0")
             g = E.SubElement(pv, "geometry")
-            sub(E.SubElement(g, "box"), "size", "0.33 0.034 0.004")
+            sub(E.SubElement(g, "box"), "size", f"{PROP_DIAMETER_M} 0.040 0.004")
             mat = E.SubElement(pv, "material")
             sub(mat, "ambient", "0.20 0.20 0.22 1")
             sub(mat, "diffuse", "0.26 0.26 0.30 1")
             sub(mat, "specular", "0.6 0.6 0.6 1")
 
-            for tip_idx, tip_x in enumerate([-0.14, 0.14]):
+            tip_r = round(PROP_DIAMETER_M / 2 - 0.026, 4)
+            for tip_idx, tip_x in enumerate([-tip_r, tip_r]):
                 tip = E.SubElement(rl, "visual", name=f"prop_tip_{r}_{tip_idx}")
                 sub(tip, "pose", f"{tip_x} 0 0.0105 0 0 0")
                 g_tip = E.SubElement(tip, "geometry")
@@ -485,20 +520,26 @@ for d_spec in drone_specs:
                 sub(m_tip, "diffuse", "1.0 1.0 1.0 1")
                 sub(m_tip, "emissive", "0.3 0.3 0.3 1")
 
-    # Calibrate MulticopterMotorModel to 2.600 kgf peak static thrust per motor (10.4 kgf total)
+    # Calibrate MulticopterMotorModel to the A6-M 6.0 kgf peak static thrust per motor (24 kgf total)
     for plug in m.findall("plugin[@name='gz::sim::systems::MulticopterMotorModel']"):
-        mc = plug.find("motorConstant")
-        if mc is not None:
-            mc.text = "2.55e-05"
+        for tag, val in [
+            ("motorConstant", f"{MOTOR_CONSTANT:.4e}"),
+            ("maxRotVelocity", f"{MAX_ROT_VELOCITY}"),
+            ("timeConstantUp", f"{MOTOR_TIME_CONSTANT_UP}"),
+            ("timeConstantDown", f"{MOTOR_TIME_CONSTANT_DOWN}"),
+        ]:
+            el = plug.find(tag)
+            if el is not None:
+                el.text = val
 
-    # Set exact 850mm wheelbase (0.300m in X/Y, <900mm limit) for optimal real-drone propeller clearance (142.8mm)
+    # Set 1,050mm wheelbase (ROTOR_XY in X/Y) for 157mm tip clearance with 23in props
     for i_rotor in range(4):
         rl = m.find(f"link[@name='rotor_{i_rotor}']")
         if rl is not None:
             p = rl.find("pose")
             if p is not None:
-                x = 0.300 if i_rotor in [0, 2] else -0.300
-                y = 0.300 if i_rotor in [1, 2] else -0.300
+                x = ROTOR_XY if i_rotor in [0, 2] else -ROTOR_XY
+                y = ROTOR_XY if i_rotor in [1, 2] else -ROTOR_XY
                 p.text = f"{x} {y} 0.06 0 0 0"
 
     # Set enlarged frame body collision (0.42 x 0.42 x 0.05m) for real avionics, battery, and payload rack clearance
@@ -650,9 +691,9 @@ for d_spec in drone_specs:
         else:
             cam.find("frame_id").text = f"rescue_{i}/camera_link"
         if hfov is None:
-            E.SubElement(cam.find("camera"), "horizontal_fov").text = "1.5708"
+            E.SubElement(cam.find("camera"), "horizontal_fov").text = str(CAM_HFOV_RAD)
         else:
-            hfov.text = "1.5708"
+            hfov.text = str(CAM_HFOV_RAD)
 
     # 13b. 360-Degree High-Rate 3D Scanning LiDAR Sensor Link & Joint
     lidar_link = m.find("link[@name='lidar_link']")
@@ -660,7 +701,7 @@ for d_spec in drone_specs:
         lidar_link = E.SubElement(m, "link", name="lidar_link")
         sub(lidar_link, "pose", "0 0 0.115 0 0 0")
         l_inert = E.SubElement(lidar_link, "inertial")
-        sub(l_inert, "mass", "0.050")
+        sub(l_inert, "mass", lidar_mass)
         l_iner = E.SubElement(l_inert, "inertia")
         for ax in ["ixx", "iyy", "izz"]:
             sub(l_iner, ax, "0.0001")
@@ -867,7 +908,7 @@ for d_spec in drone_specs:
     initial_auw = dry_mass + pkg_count * PKG_MASS
     w_total_n = initial_auw * 9.80665
     f_per_motor_n = w_total_n / 4.0
-    omega_req = math.sqrt(f_per_motor_n / 2.55e-05)
+    omega_req = math.sqrt(f_per_motor_n / MOTOR_CONSTANT)
     u_sitl_hover = max(0.2, min(0.9, (omega_req - 150.0) / 850.0))
 
     # Instantiate runtime directory for each drone instance
@@ -894,6 +935,15 @@ for d_spec in drone_specs:
         "param set-default MPC_XY_VEL_MAX 10\n"
         "param set-default MPC_Z_VEL_MAX_UP 4\n"
         "param set-default MPC_Z_VEL_MAX_DN 2\n"
+        "\n# Control allocation geometry for the 1,050mm wheelbase (FRD body frame)\n"
+        f"param set-default CA_ROTOR0_PX {ROTOR_XY}\n"
+        f"param set-default CA_ROTOR0_PY {ROTOR_XY}\n"
+        f"param set-default CA_ROTOR1_PX {-ROTOR_XY}\n"
+        f"param set-default CA_ROTOR1_PY {-ROTOR_XY}\n"
+        f"param set-default CA_ROTOR2_PX {ROTOR_XY}\n"
+        f"param set-default CA_ROTOR2_PY {-ROTOR_XY}\n"
+        f"param set-default CA_ROTOR3_PX {-ROTOR_XY}\n"
+        f"param set-default CA_ROTOR3_PY {ROTOR_XY}\n"
     )
     af.write_text(text)
 

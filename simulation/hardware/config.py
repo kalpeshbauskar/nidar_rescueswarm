@@ -31,100 +31,118 @@ class ComponentSpec:
 
 HARDWARE_BOM: Dict[str, ComponentSpec] = {
     "frame": ComponentSpec(
-        name="Rev-B Heavy-Lift Quadcopter CF Frame (850mm)",
-        mass_kg=1.250,
+        name="Rev-B XL Heavy-Lift Quadcopter CF Frame (1,050mm)",
+        mass_kg=0.936,
         source=DataSource.ESTIMATE,
-        description="850mm diagonal carbon fiber quadcopter frame (<900mm limit), central plates, 25mm arms, clamps",
+        description="1,050mm diagonal frame for 23in props: 500x500x3 CF plates (0.360), 4x 25x21mm arms cut to 430mm (0.396), 4x Z25 folding joints (0.180)",
     ),
     "landing_gear": ComponentSpec(
         name="Carbon Fiber Landing Gear (780mm track)",
-        mass_kg=0.250,
+        mass_kg=0.146,
         source=DataSource.ESTIMATE,
-        description="High-clearance wide-track T-landing gear with silicone damper skids",
+        description="2x 16x14x1000mm CF tubes cut into legs and skids",
+    ),
+    "printed_parts": ComponentSpec(
+        name="PETG Printed Parts",
+        mass_kg=0.160,
+        source=DataSource.ESTIMATE,
+        description="Canopy, landing gear T-joints, camera/GPS mounts",
     ),
     "motors": ComponentSpec(
-        name="4x T-Motor MN4014 KV330",
-        mass_kg=0.600,
-        source=DataSource.DATASHEET,
-        description="4x 150g brushless outrunner motors including factory lead wires and prop adapters",
-    ),
-    "escs": ComponentSpec(
-        name="4x 40A 6S BLHeli_32 ESCs",
-        mass_kg=0.160,
-        source=DataSource.DATASHEET,
-        description="4x 40g ESCs with aluminium heat sinks rated 40A continuous / 50A burst",
+        name="4x T-Motor A6-M KV280 + integrated 6S FOC ESC",
+        mass_kg=1.320,
+        source=DataSource.ESTIMATE,
+        description="A6-M-6S modular kit is 390g per arm incl. prop (datasheet); 330g motor+ESC+clamp, 60g prop. Mounts directly on 25mm tube (no Tarot mount)",
     ),
     "propellers": ComponentSpec(
-        name="4x 17x5.8 Carbon Fiber Propellers",
-        mass_kg=0.120,
-        source=DataSource.DATASHEET,
-        description="2x CW and 2x CCW balanced 17x5.8 ultralight carbon fiber propellers (30g each)",
+        name="4x T-Motor MF2311P-M 23in Folding Propellers",
+        mass_kg=0.240,
+        source=DataSource.ESTIMATE,
+        description="2x CW and 2x CCW 23x11 folding polymer props (585mm), ~60g each incl. holder",
     ),
     "pixhawk": ComponentSpec(
-        name="Holybro Pixhawk 6X Autopilot",
-        mass_kg=0.110,
-        source=DataSource.DATASHEET,
-        description="Pixhawk 6X flight controller and standard baseboard with shock damping",
+        name="Pixhawk 6C Pro (FMUv6C) Kit",
+        mass_kg=0.077,
+        source=DataSource.ESTIMATE,
+        description="Full-size FMUv6C flight controller with OLED, RGB LED, I2C splitter and PWM modules (ThinkRobotics kit)",
+    ),
+    "power_module": ComponentSpec(
+        name="PM02 Power Module (12S)",
+        mass_kg=0.026,
+        source=DataSource.ESTIMATE,
+        description="Analog voltage/current sense + 5.2V supply to the flight controller (in Pixhawk kit)",
     ),
     "gps": ComponentSpec(
-        name="Holybro H-RTK NEO-M9N GNSS",
-        mass_kg=0.085,
-        source=DataSource.DATASHEET,
-        description="High-precision GNSS/compass module with carbon mast",
+        name="M9N GNSS + Compass with Folding Stand",
+        mass_kg=0.057,
+        source=DataSource.ESTIMATE,
+        description="u-blox M9N GPS (0.032) + folding mast (0.025), in Pixhawk kit",
     ),
-    "power_module_pdb": ComponentSpec(
-        name="Holybro PM02D / High-Amp PDB",
-        mass_kg=0.120,
+    "telemetry_radio": ComponentSpec(
+        name="Radio Telemetry V6 433 MHz 100 mW",
+        mass_kg=0.025,
+        source=DataSource.ESTIMATE,
+        description="SiK-class MAVLink telemetry air unit (in Pixhawk kit)",
+    ),
+    "rc_receiver": ComponentSpec(
+        name="RadioMaster RP3 V2 ELRS Receiver",
+        mass_kg=0.003,
         source=DataSource.DATASHEET,
-        description="Hall-effect current sensor, dual 5.2V BEC, 120A continuous distribution board",
+        description="2.4 GHz safety-pilot override receiver",
+    ),
+    "lidar": ComponentSpec(
+        name="Benewake TFmini Plus LiDAR",
+        mass_kg=0.012,
+        source=DataSource.DATASHEET,
+        description="0.1-12m height-above-ground sensor for the 5m drop and landing",
+    ),
+    "pdb": ComponentSpec(
+        name="Holybro PDB 300A",
+        mass_kg=0.229,
+        source=DataSource.DATASHEET,
+        description="300A power distribution board sized for the A6-M 4x40A peak current",
+    ),
+    "dcdc_converters": ComponentSpec(
+        name="2x XL4016 8A Buck Converters",
+        mass_kg=0.055,
+        source=DataSource.ESTIMATE,
+        description="Jetson supply (0.040) and 6.8V DS3225 servo rail (0.015)",
     ),
     "jetson_orin_nano": ComponentSpec(
-        name="NVIDIA Jetson Orin Nano Developer Board",
-        mass_kg=0.200,
-        source=DataSource.DATASHEET,
-        description="Companion computer module, carrier board, heatsink and PWM cooling fan",
+        name="NVIDIA Jetson Orin Nano Super Developer Kit",
+        mass_kg=0.230,
+        source=DataSource.ESTIMATE,
+        description="Companion computer module, carrier board, heatsink and fan",
     ),
-    "oak_d_lite": ComponentSpec(
-        name="Luxonis OAK-D Lite Spatial AI Camera",
-        mass_kg=0.061,
-        source=DataSource.DATASHEET,
-        description="Stereo depth and 4K RGB vision camera with USB-C interface",
+    "storage": ComponentSpec(
+        name="NVMe SSD 256 GB",
+        mass_kg=0.008,
+        source=DataSource.ESTIMATE,
+        description="Jetson OS, TensorRT engines and flight logs",
     ),
-    "rfd868x_in": ComponentSpec(
-        name="RFD868x-IN Telemetry Modem",
-        mass_kg=0.045,
-        source=DataSource.DATASHEET,
-        description="868 MHz long-range telemetry modem + dipole antenna",
+    "camera": ComponentSpec(
+        name="Arducam IMX477 HQ IR-CUT Camera, 6mm CS Lens",
+        mass_kg=0.083,
+        source=DataSource.ESTIMATE,
+        description="12.3MP search camera with CS lens and CSI cable",
     ),
     "wifi_hardware": ComponentSpec(
-        name="Dual-band 5 GHz Wi-Fi NIC",
-        mass_kg=0.035,
-        source=DataSource.DATASHEET,
-        description="M.2 802.11ac/ax high-throughput Wi-Fi adapter for local swarm mesh",
-    ),
-    "antennas": ComponentSpec(
-        name="5 GHz RP-SMA Antennas & Pigtails",
-        mass_kg=0.030,
+        name="ALFA AWUS036ACM USB Wi-Fi Adapter",
+        mass_kg=0.070,
         source=DataSource.ESTIMATE,
-        description="Dual 5 GHz 3dBi dipole antennas and RG178 coaxial pigtails",
-    ),
-    "dcdc_bec_converters": ComponentSpec(
-        name="Dual DC-DC Step-Down Regulators",
-        mass_kg=0.065,
-        source=DataSource.ESTIMATE,
-        description="5V 5A and 12V 3A high-efficiency switching regulators for companion electronics",
+        description="MT7612U 802.11s mesh node with 2x 5dBi antennas",
     ),
     "payload_drop_rack_4slot": ComponentSpec(
-        name="5-Slot Mechanical Quick-Release Drop Rack",
-        mass_kg=0.250,
+        name="5-Slot Drop Rack with DS3225 Servos",
+        mass_kg=0.529,
         source=DataSource.NEEDS_PHYSICAL_MEASUREMENT,
-        description="Carbon fibre mounting plate, 5-bay package guides, micro servos and release pins",
+        description="PETG/CF rack (0.180), 5x DS3225 servos (0.300), 5x metal horns (0.025), CF release pins (0.015), PCA9685 (0.009)",
     ),
     "payload_drop_rack_5slot": ComponentSpec(
-        name="5-Slot Mechanical Quick-Release Drop Rack",
-        mass_kg=0.250,
+        name="5-Slot Drop Rack with DS3225 Servos",
+        mass_kg=0.529,
         source=DataSource.NEEDS_PHYSICAL_MEASUREMENT,
-        description="Carbon fibre mounting plate, 5-bay package guides, micro servos and release pins",
+        description="PETG/CF rack (0.180), 5x DS3225 servos (0.300), 5x metal horns (0.025), CF release pins (0.015), PCA9685 (0.009)",
     ),
     "payload_drop_rack_2slot": ComponentSpec(
         name="2-Slot Mechanical Release Rack",
@@ -134,107 +152,54 @@ HARDWARE_BOM: Dict[str, ComponentSpec] = {
     ),
     "wiring": ComponentSpec(
         name="Power & Signal Wiring Harness",
-        mass_kg=0.120,
+        mass_kg=0.222,
         source=DataSource.NEEDS_PHYSICAL_MEASUREMENT,
-        description="10 AWG silicone power leads, 16 AWG motor extensions, CAN/UART/I2C harness",
-    ),
-    "connectors": ComponentSpec(
-        name="Power & Data Connectors",
-        mass_kg=0.045,
-        source=DataSource.ESTIMATE,
-        description="XT90-S anti-spark main connector, XT60 auxiliary, JST-GH locking connectors",
-    ),
-    "heat_shrink": ComponentSpec(
-        name="Heat Shrink Tubing & Insulation",
-        mass_kg=0.020,
-        source=DataSource.ESTIMATE,
-        description="Polyolefin heat shrink on power splices, ESC joints and wiring wraps",
+        description="XT90-S, 10 AWG battery leads, 12 AWG leads to the arm-tip ESCs, heat shrink, Dupont/JST signal leads, Jetson DC lead",
     ),
     "fasteners": ComponentSpec(
-        name="Screws, Standoffs & Nuts",
-        mass_kg=0.055,
+        name="Screws, Standoffs, Straps & Mounting Hardware",
+        mass_kg=0.225,
         source=DataSource.ESTIMATE,
-        description="M3/M4 stainless steel screws, nylon standoffs, brass inserts, locking nuts",
-    ),
-    "vibration_mounts": ComponentSpec(
-        name="Avionics Silicone Isolators",
-        mass_kg=0.025,
-        source=DataSource.ESTIMATE,
-        description="Silicone damping balls for flight controller and sensor sub-assemblies",
-    ),
-    "storage": ComponentSpec(
-        name="NVMe SSD & High-Endurance MicroSD",
-        mass_kg=0.015,
-        source=DataSource.DATASHEET,
-        description="256 GB M.2 NVMe SSD for Jetson OS/models + 64 GB MicroSD for Pixhawk logging",
-    ),
-    "buzzer_status_leds": ComponentSpec(
-        name="Arming LED & Piezo Buzzer",
-        mass_kg=0.025,
-        source=DataSource.DATASHEET,
-        description="External daylight-visible RGB status LED and 90 dB emergency locator buzzer",
-    ),
-
-    "landing_gear_ext": ComponentSpec(
-        name="Extended CF Landing Skids",
-        mass_kg=0.100,
-        source=DataSource.ESTIMATE,
-        description="Extended wide-track carbon fiber landing gear to prevent rollover in 5m/s wind",
-    ),
-
-    "camera_bracket": ComponentSpec(
-        name="Extended Camera Mounting Bracket",
-        mass_kg=0.015,
-        source=DataSource.ESTIMATE,
-        description="Carbon fiber bracket for forward-and-lower camera mounting",
-    ),
-    "gimbal": ComponentSpec(
-        name="2-Axis Camera Gimbal",
-        mass_kg=0.065,
-        source=DataSource.ESTIMATE,
-        description="Lightweight 2-axis stabilized mount for OAK-D Lite. ESTIMATE.",
+        description="M3 bolts/nuts/standoffs, damper set, battery straps, ties, velcro, tape, solder",
     ),
     "battery": ComponentSpec(
-        name="6S 16.0V 16,000 mAh LiPo Battery",
-        mass_kg=1.930,
+        name="Tattu 22,000 mAh 6S 25C LiPo",
+        mass_kg=2.490,
         source=DataSource.DATASHEET,
-        description="6S1P 25C high-energy LiPo battery pack with 10 AWG silicon wire and XT90 connector",
-    ),
-    "misc_engineering_allowance": ComponentSpec(
-        name="Engineering Allowance & Hardware Margin",
-        mass_kg=-0.516,
-        source=DataSource.ESTIMATE,
-        description="5% reserve for conformal coating, cable ties, tape, labels, and manufacturing variance",
+        description="22.2V 488Wh 6S1P pack with XT90-S, 200x91x64mm",
     ),
 }
 
 
 # ============================================================================
-# PROPULSION BENCHMARK TEST DATA (T-Motor MN4014 KV330 + 17x5.8 Props on 6S 22.2V)
+# PROPULSION MODEL (T-Motor A6-M-6S KV280 + MF2311P-M 23in prop on 6S 22.2V)
 # ============================================================================
-# Source: T-Motor Official Dynamometer Test Bench Data (6S 22.2V nominal)
+# T-Motor publishes only three points: max thrust 6.0 kgf, rated thrust 2-2.5 kgf,
+# and 10 g/W at 2.3 kgf. The curve below is SIMULATION_DERIVED from those points:
+# thrust = 6.0 * throttle^2 and power = 65.94 * thrust^1.5 (momentum-theory scaling
+# anchored at 230 W for 2.3 kgf). Replace with bench data once a kit is measured.
 # Columns: Throttle fraction [0..1], Thrust per motor (kgf), Current per motor (A), Power (W)
 MOTOR_TEST_DATA: List[Tuple[float, float, float, float]] = [
     # (throttle, thrust_kgf, current_a, power_w)
-    (0.35, 0.520, 1.8, 40.0),
-    (0.40, 0.680, 2.5, 55.5),
-    (0.50, 1.020, 4.4, 97.7),
-    (0.60, 1.420, 7.2, 159.8),
-    (0.65, 1.620, 8.8, 195.4),
-    (0.70, 1.830, 10.6, 235.3),
-    (0.75, 2.040, 12.4, 275.3),
-    (0.80, 2.240, 14.1, 313.0),
-    (0.85, 2.400, 15.3, 339.7),
-    (0.90, 2.510, 16.2, 359.6),
-    (1.00, 2.600, 17.0, 377.4),
+    (0.35, 0.735, 1.9, 41.5),
+    (0.40, 0.960, 2.8, 62.0),
+    (0.50, 1.500, 5.5, 121.1),
+    (0.60, 2.160, 9.4, 209.3),
+    (0.65, 2.535, 12.0, 266.1),
+    (0.70, 2.940, 15.0, 332.4),
+    (0.75, 3.375, 18.4, 408.8),
+    (0.80, 3.840, 22.4, 496.2),
+    (0.85, 4.335, 26.8, 595.1),
+    (0.90, 4.860, 31.8, 706.5),
+    (1.00, 6.000, 43.7, 969.1),
 ]
 
 # Physical propulsion limits per drone (4 motors)
 MOTORS_PER_DRONE: int = 4
-MAX_THRUST_PER_MOTOR_KGF: float = 2.600  # DATASHEET
-MAX_CURRENT_PER_MOTOR_A: float = 17.0    # DATASHEET
-MAX_TOTAL_THRUST_KGF: float = MOTORS_PER_DRONE * MAX_THRUST_PER_MOTOR_KGF  # 10.4 kgf (~102.0 N)
-MAX_PROPULSION_CURRENT_A: float = MOTORS_PER_DRONE * MAX_CURRENT_PER_MOTOR_A  # 68.0 A
+MAX_THRUST_PER_MOTOR_KGF: float = 6.000  # DATASHEET
+MAX_CURRENT_PER_MOTOR_A: float = 43.7    # SIMULATION_DERIVED (100% throttle on the curve above)
+MAX_TOTAL_THRUST_KGF: float = MOTORS_PER_DRONE * MAX_THRUST_PER_MOTOR_KGF  # 24.0 kgf (~235.4 N)
+MAX_PROPULSION_CURRENT_A: float = MOTORS_PER_DRONE * MAX_CURRENT_PER_MOTOR_A  # 174.8 A
 MIN_TW_RATIO_REQUIRED: float = 1.50      # Validation threshold
 
 
@@ -244,13 +209,13 @@ MIN_TW_RATIO_REQUIRED: float = 1.50      # Validation threshold
 
 @dataclass(frozen=True)
 class ElectricalLimits:
-    esc_continuous_current_a: float = 40.0   # DATASHEET: 40A per ESC
-    esc_burst_current_a: float = 50.0        # DATASHEET: 50A for 10s
-    pdb_continuous_current_a: float = 120.0  # DATASHEET: 120A continuous
+    esc_continuous_current_a: float = 40.0   # DATASHEET: A6-M FOC ESC 40A short-time peak (hover is ~9A)
+    esc_burst_current_a: float = 50.0        # DATASHEET: A6-M 6S FOC 50A ESC
+    pdb_continuous_current_a: float = 300.0  # DATASHEET: Holybro PDB 300A
     connector_continuous_a: float = 90.0     # DATASHEET: XT90-S 90A cont / 120A peak
     main_wire_10awg_rating_a: float = 140.0  # DATASHEET: 10 AWG silicone <30cm
     motor_wire_16awg_rating_a: float = 35.0  # DATASHEET: 16 AWG silicone chassis
-    avionics_power_nominal_w: float = 32.0   # Jetson (15W) + Gimbal (2W) (15W) + Pixhawk (5W) + OAK-D (3W) + RFD (2W) + BEC (5W)
+    avionics_power_nominal_w: float = 30.5   # Jetson+SSD+Wi-Fi+camera (25.6W via buck) + Pixhawk+GPS+radios+LiDAR (4.3W via PM02) + servos (0.6W)
     nominal_voltage_v: float = 22.2          # 6S LiPo nominal voltage
 
 
@@ -258,21 +223,21 @@ ELECTRICAL_LIMITS = ElectricalLimits()
 
 
 # ============================================================================
-# BATTERY SPECIFICATIONS (6S LiPo 12,000 mAh)
+# BATTERY SPECIFICATIONS (Tattu 6S LiPo 22,000 mAh)
 # ============================================================================
 
 @dataclass(frozen=True)
 class BatterySpecs:
     nominal_voltage_v: float = 22.2          # DATASHEET
-    capacity_mah: float = 16000.0            # DATASHEET
-    capacity_ah: float = 16.0
-    nominal_energy_wh: float = 355.2         # 22.2V * 12.0Ah = 266.4 Wh
+    capacity_mah: float = 22000.0            # DATASHEET
+    capacity_ah: float = 22.0
+    nominal_energy_wh: float = 488.4         # 22.2V * 22.0Ah
     usable_fraction: float = 0.80            # 80% usable energy
     reserve_fraction: float = 0.20           # 20% hard reserve
-    usable_energy_wh: float = 284.16         # 0.80 * 266.4 = 213.12 Wh (767,232 J)
-    reserve_energy_wh: float = 71.04         # 0.20 * 266.4 = 53.28 Wh (191,808 J)
-    max_continuous_discharge_c: float = 25.0 # DATASHEET: 25C continuous (300 A)
-    battery_mass_kg: float = 1.670           # DATASHEET: 1.670 kg
+    usable_energy_wh: float = 390.72         # 0.80 * 488.4 Wh
+    reserve_energy_wh: float = 97.68         # 0.20 * 488.4 Wh
+    max_continuous_discharge_c: float = 25.0 # DATASHEET: 25C continuous (550 A)
+    battery_mass_kg: float = 2.490           # DATASHEET: ~2.49 kg
 
 
 BATTERY_SPECS = BatterySpecs()
