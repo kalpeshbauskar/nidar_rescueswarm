@@ -39,6 +39,7 @@ datasets/coco_raw/
 runs/
 
 # Build & temporary files
+simulation_original/
 *.lock
 simulation/dual/latest-run.txt
 simulation/px4-runtime/

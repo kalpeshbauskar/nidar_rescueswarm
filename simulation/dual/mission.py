@@ -785,11 +785,16 @@ class Drone(RosNode):
                     mass_kg=round(self.packages_total * PACKAGE_MASS_KG, 3),
                     auw_kg=self.payload_tracker.current_auw_kg,
                 )
-                # Compute search lawnmower route for this drone's zone
-                lane_width = 20
-                num_lanes = max(3, int((self.z['east_max'] - self.z['east_min']) / lane_width))
+                # Compute search lawnmower route for this drone's zone (5 lanes outward from center)
+                num_lanes = 5
+                lane_width = (self.z['east_max'] - self.z['east_min']) / num_lanes  # 32m spacing
                 for k in range(num_lanes):
-                    east = self.z['east_min'] + 10 + lane_width * k
+                    if self.i == 0:
+                        # Drone 1 sweeps Westward from center: -16m, -48m, -80m, -112m, -144m
+                        east = self.z['east_max'] - (k + 0.5) * lane_width
+                    else:
+                        # Drone 2 sweeps Eastward from center: +16m, +48m, +80m, +112m, +144m
+                        east = self.z['east_min'] + (k + 0.5) * lane_width
                     start, end = (-144, 144) if k % 2 == 0 else (144, -144)
                     self.route.extend([(start, east), (end, east)])
                 self.set_target(self.home[0], self.home[1], 25)
@@ -801,18 +806,24 @@ class Drone(RosNode):
         if self.phase == 'LAND':
             alt = -self.global_p[2] if self.global_p is not None else 10.0
             vz = -self.p.vz if self.p else 0.0
+            is_landed = False
+            if hasattr(self, 'land') and self.land and getattr(self.land, 'landed', False):
+                is_landed = True
+            elif alt < 0.70 and abs(vz) < 0.25 and (now - self.since > 2.0):
+                is_landed = True
+
             if self.s and self.s.arming_state != 2:
                 self.done = True
                 self.phase_to('DONE')
                 self.event('landed_disarmed', error=self.error)
                 (OUT / f'drone{self.i+1}-status.json').write_text(json.dumps(self.status(), indent=2))
                 return
-            elif alt < 0.35 and abs(vz) < 0.20 and (now - self.since > 3.0):
+            elif is_landed:
                 if now - self.last_cmd > 0.5:
                     self.command(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 0)
             elif now - self.last_cmd > 1.5:
                 self.command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
-            if now - self.since > 90:
+            if now - self.since > 45:
                 self.error = self.error or 'landing timeout'
                 self.done = True
             return
@@ -902,14 +913,14 @@ class Drone(RosNode):
                     else:
                         self.set_target(*self.route[self.index], 25)
             elif self.phase == 'APPROACH':
-                if self.arrived():
+                if self.arrived(tolerance=1.0, dwell=0.25, speed=1.0):
                     d = self.detections[self.target_id]
                     wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
                     wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
-                    self.set_target(d['n'] + wind_n_comp, d['e'], 3.0)
+                    self.set_target(d['n'] + wind_n_comp, d['e'], 4.0)
                     self.phase_to('DESCEND')
             elif self.phase == 'DESCEND':
-                if self.arrived(dwell=0.8, speed=0.5):
+                if self.arrived(tolerance=0.85, dwell=0.35, speed=0.7):
                     d = self.detections[self.target_id]
                     wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
                     wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
@@ -917,11 +928,11 @@ class Drone(RosNode):
                         print(f"[DELIVERY] Arrived at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f}). Offsetting setpoint N={d['n']+wind_n_comp:.1f} for {wind_speed}m/s wind...")
                     else:
                         print(f"[DELIVERY] Arrived at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f}). Pinpoint precision drop directly overhead.")
-                    self.set_target(d['n'] + wind_n_comp, d['e'], 3.0)
+                    self.set_target(d['n'] + wind_n_comp, d['e'], 4.0)
                     self.phase_to('RELEASE')
             elif self.phase == 'RELEASE':
                 d = self.detections[self.target_id]
-                if self.arrived(tolerance=0.6, dwell=0.8, speed=0.35):
+                if self.arrived(tolerance=0.75, dwell=0.35, speed=0.5):
                     # Bilateral CG-preserving drop order: Front-Left, Aft-Right, Front-Right, Aft-Left, Center
                     order = [0, 4, 1, 3, 2] if self.packages_total >= 5 else ([0, 3, 1, 2] if self.packages_total == 4 else list(range(self.packages_total)))
                     j = order[self.packages_used] if self.packages_used < len(order) else (self.packages_used % self.packages_total)
@@ -929,10 +940,10 @@ class Drone(RosNode):
                         self._drop_triggered = True
                         self._drop_time = now
                         self.cargo_send(j, 'detach')
-                        print(f"*** [PAYLOAD DROP ACTIVE] Drone {self.i+1} DETACHED Canister #{j+1} at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f})! Hovering 2.0s for visual drop verification ***")
+                        print(f"*** [PAYLOAD DROP ACTIVE] Drone {self.i+1} DETACHED Canister #{j+1} at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f})! Hovering 1.5s for visual drop verification ***")
 
-                    # Hover 2.0s to let package fall 3m to ground under gravity
-                    if (now - getattr(self, '_drop_time', now) > 2.0):
+                    # Hover 1.5s to let package fall 4m to ground under gravity
+                    if (now - getattr(self, '_drop_time', now) > 1.5):
                         self._drop_triggered = False
                         d['delivered'] = True
                         prop_state = self.payload_tracker.release_package(f'parcel_{self.i}_{j}')
@@ -960,19 +971,19 @@ class Drone(RosNode):
                         self.set_target(self.global_p[0], self.global_p[1], 25)
                         self.phase_to('ASCEND')
             elif self.phase == 'ASCEND':
-                if self.arrived():
+                if self.arrived(tolerance=1.5, dwell=0.2, speed=1.2):
                     if self.packages_used >= self.packages_total:
                         self.set_target(self.home[0], self.home[1], 25)
                         self.phase_to('RETURN')
                     else:
-                        self.set_target(self.resume[0], self.resume[1], 25)
-                        self.phase_to('RESUME')
+                        self.set_target(*self.route[self.index], 25)
+                        self.phase_to('SEARCH')
             elif self.phase == 'RESUME':
-                if self.arrived():
+                if self.arrived(tolerance=2.0, dwell=0.2, speed=1.5):
                     self.set_target(*self.route[self.index], 25)
                     self.phase_to('SEARCH')
             elif self.phase == 'RETURN':
-                if self.arrived():
+                if self.arrived(tolerance=1.5, dwell=0.3, speed=1.0):
                     self.phase_to('LAND')
 
 

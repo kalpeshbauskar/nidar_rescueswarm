@@ -43,18 +43,18 @@
         {
           "id": 0,
           "east_min": -160,
-          "east_max": 30,
+          "east_max": 0,
           "north_min": -156.25,
           "north_max": 156.25,
-          "area_m2": 59375
+          "area_m2": 50000
         },
         {
           "id": 1,
-          "east_min": 30,
+          "east_min": 0,
           "east_max": 160,
           "north_min": -156.25,
           "north_max": 156.25,
-          "area_m2": 40625
+          "area_m2": 50000
         }
       ],
       "survivors": [
@@ -80,7 +80,7 @@
           "east": 60,
           "north": -130,
           "z": 0.05,
-          "sector": 1
+          "sector": 2
         },
         {
           "id": 10,
@@ -88,7 +88,7 @@
           "east": 130,
           "north": -90,
           "z": 0.05,
-          "sector": 1
+          "sector": 2
         },
         {
           "id": 4,
@@ -112,7 +112,7 @@
           "east": -110,
           "north": 60,
           "z": 0.05,
-          "sector": 2
+          "sector": 1
         },
         {
           "id": 9,
@@ -128,7 +128,7 @@
           "east": -80,
           "north": 120,
           "z": 0.05,
-          "sector": 2
+          "sector": 1
         },
         {
           "id": 2,
@@ -145,18 +145,18 @@
     {
       "id": 0,
       "east_min": -160,
-      "east_max": 30,
+      "east_max": 0,
       "north_min": -156.25,
       "north_max": 156.25,
-      "area_m2": 59375
+      "area_m2": 50000
     },
     {
       "id": 1,
-      "east_min": 30,
+      "east_min": 0,
       "east_max": 160,
       "north_min": -156.25,
       "north_max": 156.25,
-      "area_m2": 40625
+      "area_m2": 50000
     }
   ]
 }
