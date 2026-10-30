@@ -1,6 +1,6 @@
 """NIDAR RescueSwarm Camera-Search / Physical Delivery Mission Controller.
 
-Integrates authoritative hardware models (dynamic mass reduction, interpolated T-Motor
+Integrates authoritative hardware models (dynamic mass reduction, interpolated Hobbywing X6-SE
 propulsion, battery SOC integration, and deterministic private network failsafes).
 Supports both 3-drone competition and 2-drone legacy profiles configurably.
 """
@@ -854,7 +854,7 @@ class Drone(RosNode):
             elif now - self.last_cmd > 2:
                 self.command(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1)
         elif self.phase == 'TAKEOFF':
-            if self.arrived():
+            if self.arrived(tolerance=2.0, dwell=0.1, speed=1.5):
                 self.set_target(*self.route[0], 25)
                 self.phase_to('TRANSIT')
         elif self.phase == 'TRANSIT':
@@ -896,7 +896,7 @@ class Drone(RosNode):
                         self.set_target(d['n'], d['e'], 25)
                         self.phase_to('APPROACH')
                         return
-                if self.arrived(tolerance=1.0, dwell=0.15, speed=1.5):
+                if self.arrived(tolerance=3.0, dwell=0.08, speed=2.5):
                     self.index += 1
                     if self.index >= len(self.route):
                         if self.packages_used < self.packages_total and getattr(self, 'battery_integrator', None) and self.battery_integrator.usable_energy_remaining_wh > 80.0:
@@ -913,14 +913,20 @@ class Drone(RosNode):
                     else:
                         self.set_target(*self.route[self.index], 25)
             elif self.phase == 'APPROACH':
-                if self.arrived(tolerance=1.0, dwell=0.25, speed=1.0):
-                    d = self.detections[self.target_id]
-                    wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
-                    wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
+                dist_h = math.hypot(self.global_p[0] - self.target[0], self.global_p[1] - self.target[1])
+                d = self.detections[self.target_id]
+                wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
+                wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
+                if dist_h < 25.0:
+                    self.set_target(d['n'] + wind_n_comp, d['e'], 4.0)
+                    self.phase_to('DESCEND')
+                elif self.arrived(tolerance=2.0, dwell=0.1, speed=2.0):
                     self.set_target(d['n'] + wind_n_comp, d['e'], 4.0)
                     self.phase_to('DESCEND')
             elif self.phase == 'DESCEND':
-                if self.arrived(tolerance=0.85, dwell=0.35, speed=0.7):
+                dist_h = math.hypot(self.global_p[0] - self.target[0], self.global_p[1] - self.target[1])
+                alt = -self.global_p[2] if self.global_p is not None else 10.0
+                if (dist_h < 0.85 and alt <= 4.6 and abs(self.p.vz) < 0.8) or self.arrived(tolerance=0.85, dwell=0.2, speed=0.7):
                     d = self.detections[self.target_id]
                     wind_speed = float(os.environ.get("WIND_SPEED", "0.0"))
                     wind_n_comp = -0.5 * wind_speed if wind_speed > 0 else 0.0
@@ -932,46 +938,45 @@ class Drone(RosNode):
                     self.phase_to('RELEASE')
             elif self.phase == 'RELEASE':
                 d = self.detections[self.target_id]
-                if self.arrived(tolerance=0.75, dwell=0.35, speed=0.5):
-                    # Bilateral CG-preserving drop order: Front-Left, Aft-Right, Front-Right, Aft-Left, Center
-                    order = [0, 4, 1, 3, 2] if self.packages_total >= 5 else ([0, 3, 1, 2] if self.packages_total == 4 else list(range(self.packages_total)))
-                    j = order[self.packages_used] if self.packages_used < len(order) else (self.packages_used % self.packages_total)
-                    if not getattr(self, '_drop_triggered', False):
-                        self._drop_triggered = True
-                        self._drop_time = now
-                        self.cargo_send(j, 'detach')
-                        print(f"*** [PAYLOAD DROP ACTIVE] Drone {self.i+1} DETACHED Canister #{j+1} at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f})! Hovering 1.5s for visual drop verification ***")
+                order = [0, 4, 1, 3, 2] if self.packages_total >= 5 else ([0, 3, 1, 2] if self.packages_total == 4 else list(range(self.packages_total)))
+                j = order[self.packages_used] if self.packages_used < len(order) else (self.packages_used % self.packages_total)
+                if not getattr(self, '_drop_triggered', False):
+                    self._drop_triggered = True
+                    self._drop_time = now
+                    self.cargo_send(j, 'detach')
+                    print(f"*** [PAYLOAD DROP ACTIVE] Drone {self.i+1} DETACHED Canister #{j+1} at Target {self.target_id} (N={d['n']:.1f}, E={d['e']:.1f})! Hovering 1.0s for visual drop verification ***")
 
-                    # Hover 1.5s to let package fall 4m to ground under gravity
-                    if (now - getattr(self, '_drop_time', now) > 1.5):
-                        self._drop_triggered = False
-                        d['delivered'] = True
-                        prop_state = self.payload_tracker.release_package(f'parcel_{self.i}_{j}')
-                        drop = {
-                            'drone': self.i + 1,
-                            'parcel': f'parcel_{self.i}_{j}',
-                            'target': self.target_id,
-                            'package_mass_kg': PACKAGE_MASS_KG,
-                            'north': d['n'],
-                            'east': d['e'],
-                            'release_north': float(self.global_p[0]),
-                            'release_east': float(self.global_p[1]),
-                            'release_altitude': float(-self.global_p[2]),
-                            'elapsed': now - self.start,
-                            'speed_h': float(math.hypot(self.p.vx, self.p.vy)),
-                            'speed_v': float(-self.p.vz),
-                            'new_auw_kg': prop_state.auw_kg,
-                            'new_tw_ratio': prop_state.tw_ratio,
-                            'packages_remaining': self.payload_tracker.packages_remaining,
-                        }
-                        self.drops.append(drop)
-                        self.event('package_released', **drop)
-                        self.packages_used += 1
-                        print(f"*** [PAYLOAD DROP CONFIRMED] Canister #{j+1} landed beside survivor! Packages remaining: {self.payload_tracker.packages_remaining}. Ascending to 25m ***")
-                        self.set_target(self.global_p[0], self.global_p[1], 25)
-                        self.phase_to('ASCEND')
+                # Hover 1.0s to let package fall 4m to ground under gravity
+                if (now - getattr(self, '_drop_time', now) > 1.0):
+                    self._drop_triggered = False
+                    d['delivered'] = True
+                    prop_state = self.payload_tracker.release_package(f'parcel_{self.i}_{j}')
+                    drop = {
+                        'drone': self.i + 1,
+                        'parcel': f'parcel_{self.i}_{j}',
+                        'target': self.target_id,
+                        'package_mass_kg': PACKAGE_MASS_KG,
+                        'north': d['n'],
+                        'east': d['e'],
+                        'release_north': float(self.global_p[0]),
+                        'release_east': float(self.global_p[1]),
+                        'release_altitude': float(-self.global_p[2]),
+                        'elapsed': now - self.start,
+                        'speed_h': float(math.hypot(self.p.vx, self.p.vy)),
+                        'speed_v': float(-self.p.vz),
+                        'new_auw_kg': prop_state.auw_kg,
+                        'new_tw_ratio': prop_state.tw_ratio,
+                        'packages_remaining': self.payload_tracker.packages_remaining,
+                    }
+                    self.drops.append(drop)
+                    self.event('package_released', **drop)
+                    self.packages_used += 1
+                    print(f"*** [PAYLOAD DROP CONFIRMED] Canister #{j+1} landed beside survivor! Packages remaining: {self.payload_tracker.packages_remaining}. Ascending to 25m ***")
+                    self.set_target(self.global_p[0], self.global_p[1], 25)
+                    self.phase_to('ASCEND')
             elif self.phase == 'ASCEND':
-                if self.arrived(tolerance=1.5, dwell=0.2, speed=1.2):
+                alt = -self.global_p[2] if self.global_p is not None else 0.0
+                if alt > 18.0 or self.arrived(tolerance=2.0, dwell=0.1, speed=1.5):
                     if self.packages_used >= self.packages_total:
                         self.set_target(self.home[0], self.home[1], 25)
                         self.phase_to('RETURN')
@@ -983,7 +988,7 @@ class Drone(RosNode):
                     self.set_target(*self.route[self.index], 25)
                     self.phase_to('SEARCH')
             elif self.phase == 'RETURN':
-                if self.arrived(tolerance=1.5, dwell=0.3, speed=1.0):
+                if self.arrived(tolerance=2.5, dwell=0.15, speed=1.5):
                     self.phase_to('LAND')
 
 

@@ -21,14 +21,12 @@ def generate_launch_description():
     use_ssd = IfCondition(PythonExpression(["'", detector, "' in ['ssd', 'both']"]))
     use_yolo = IfCondition(PythonExpression(["'", detector, "' in ['yolo', 'both']"]))
 
-    # Consolidated Gazebo -> ROS Bridge for Camera and LiDAR (Scans & 3D Point Clouds)
+    # Consolidated Gazebo -> ROS Bridge for Camera and System Clock
     bridge_0 = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
             '/rescue_0/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
-            '/rescue_0/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '/rescue_0/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'
         ],
         parameters=[{
@@ -69,14 +67,12 @@ def generate_launch_description():
         output='screen'
     )
     
-    # Consolidated Gazebo -> ROS Bridge for Drone 1 (Camera, LiDAR 2D & 3D)
+    # Consolidated Gazebo -> ROS Bridge for Drone 1 (Camera)
     bridge_1 = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            '/rescue_1/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
-            '/rescue_1/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '/rescue_1/scan/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
+            '/rescue_1/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image'
         ],
         parameters=[{
             'override_timestamps_with_wall_time': True

@@ -44,7 +44,7 @@ Validates all 15 key competition criteria:
 9. Usable battery energy sufficient
 10. 20% hard battery reserve remains intact
 11. ESC current limits valid
-12. Electrical system assumptions valid (PDB, battery 25C, connectors, wiring)
+12. Electrical system assumptions valid (PDB, solid-state battery 5C, connectors, wiring)
 13. Completely offline operation (zero Internet, LTE, 5G, GSM, cloud)
 14. Package release updates mass dynamically (4 -> 3 -> 2 -> 1 -> 0)
 15. Deterministic network failsafes work (including navigation-aware link loss)
@@ -65,6 +65,7 @@ from simulation.hardware.config import (
     BATTERY_SPECS,
     ELECTRICAL_LIMITS,
     FLEET_SIZE,
+    MAX_CURRENT_PER_MOTOR_A,
     MAX_FLEET_AUW_KG,
     MAX_MISSION_TIME_SEC,
     MAX_TOTAL_THRUST_KGF,
@@ -257,7 +258,7 @@ def run_hardware_checks(mission_result: dict = None) -> dict:
     esc_check = validate_electrical_limits(init_prop_d1.total_propulsion_current_a)
     checks["esc_current_limits_valid"] = {
         "passed": esc_check.esc_limit_ok and esc_check.motor_current_ok,
-        "details": f"Motor current {init_prop_d1.motor_current_a:.1f}A <= 40A continuous ESC rating (Tested max: 17.0A)",
+        "details": f"Motor current {init_prop_d1.motor_current_a:.1f}A <= {ELECTRICAL_LIMITS.esc_continuous_current_a}A continuous ESC rating (Tested max: {MAX_CURRENT_PER_MOTOR_A}A)",
     }
 
     # 12. Electrical assumptions valid
@@ -265,7 +266,7 @@ def run_hardware_checks(mission_result: dict = None) -> dict:
         "passed": esc_check.all_ok,
         "details": (
             f"PDB: {esc_check.pdb_capacity_ok} ({ELECTRICAL_LIMITS.pdb_continuous_current_a}A), "
-            f"Battery 25C: {esc_check.battery_discharge_ok} (300A), "
+            f"Battery {BATTERY_SPECS.max_continuous_discharge_c}C: {esc_check.battery_discharge_ok} ({BATTERY_SPECS.capacity_ah * BATTERY_SPECS.max_continuous_discharge_c:.0f}A), "
             f"XT90-S: {esc_check.connector_capacity_ok} ({ELECTRICAL_LIMITS.connector_continuous_a}A), "
             f"10 AWG wire: {esc_check.wiring_capacity_ok} ({ELECTRICAL_LIMITS.main_wire_10awg_rating_a}A)"
         ),
@@ -431,8 +432,8 @@ def main():
             "battery_nominal_wh": BATTERY_SPECS.nominal_energy_wh,
             "battery_usable_wh": BATTERY_SPECS.usable_energy_wh,
             "battery_reserve_wh": BATTERY_SPECS.reserve_energy_wh,
-            "motor": "T-Motor MN4014 KV330",
-            "propeller": "17x5.8 Carbon Fiber",
+            "motor": "Hobbywing X6-SE 280KV",
+            "propeller": "Hobbywing 2270 (22x7.0) Folding Propellers",
             "network": {
                 "rfd868x": "868 MHz Critical Telemetry",
                 "wifi": "5 GHz Private Local WPA3 LAN",

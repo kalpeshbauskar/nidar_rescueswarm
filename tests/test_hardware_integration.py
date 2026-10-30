@@ -8,22 +8,25 @@ Validates:
 5. fleet AUW (<= 25 kg)
 6. thrust-to-weight ratio (T/W >= 1.5 at all stages)
 7. motor and ESC current limits (interpolated vs 40A ESC and 17A motor max)
-8. battery energy & hard reserve separation (266.4 Wh nominal, 213.12 Wh usable, 53.28 Wh reserve)
+8. battery energy & hard reserve separation (501.6 Wh nominal, 401.28 Wh usable, 100.32 Wh reserve)
 9. dynamic SOC tracking across flight phases
 10. 30-minute maximum duration rule logic (duration <= 30 min AND duration <= battery capacity)
 11. Wi-Fi failure case (video degraded, telemetry on RFD868x-IN)
 12. RFD failure case (primary link failure logged, backup on Wi-Fi)
 13. total link loss navigation-aware failsafe (RTL if nav valid; safe hold/land if nav invalid)
 14. connection recovery behavior (restore normal operation, buffer flush)
+15. removal of lidar and presence of RTK GNSS & Revogreen solid-state battery
 """
 
 import pytest
 import math
+from pathlib import Path
 
 from simulation.hardware.config import (
     BATTERY_SPECS,
     ELECTRICAL_LIMITS,
     FLEET_SIZE,
+    HARDWARE_BOM,
     MAX_FLEET_AUW_KG,
     MAX_MISSION_TIME_SEC,
     MAX_TOTAL_THRUST_KGF,
@@ -59,8 +62,8 @@ class TestHardwareIntegration:
             dry_mass = get_drone_dry_mass_kg(drone_id)
             initial_auw = get_drone_initial_auw_kg(drone_id)
 
-            assert dry_mass > 6.5, f"Dry mass too low: {dry_mass} kg"
-            assert dry_mass < 7.5, f"Dry mass too high: {dry_mass} kg"
+            assert dry_mass > 5.0, f"Dry mass too low: {dry_mass} kg"
+            assert dry_mass < 6.2, f"Dry mass too high: {dry_mass} kg"
             assert initial_auw > dry_mass
             expected_payload = PAYLOAD_ALLOCATION[drone_id] * PACKAGE_MASS_KG
             assert math.isclose(initial_auw, dry_mass + expected_payload, rel_tol=1e-4)
@@ -103,8 +106,8 @@ class TestHardwareIntegration:
         """Test maximum combined fleet AUW is strictly <= 25 kg."""
         fleet_auw = get_fleet_initial_auw_kg()
         assert fleet_auw <= MAX_FLEET_AUW_KG, f"Fleet AUW {fleet_auw} kg exceeds {MAX_FLEET_AUW_KG} kg limit"
-        # Check specific calculated value: 2 x 8.143 kg = ~16.3 kg
-        assert 16.0 <= fleet_auw <= 16.6
+        # Check specific calculated value: 2 x 6.582 kg = ~13.16 kg
+        assert 12.5 <= fleet_auw <= 14.5
 
     def test_06_thrust_to_weight_ratio(self):
         """Test T/W ratio >= 1.5 across all drones at both initial AUW and empty payload."""
@@ -144,10 +147,10 @@ class TestHardwareIntegration:
             assert elec.wiring_capacity_ok is True
 
     def test_08_battery_energy_and_reserve_separation(self):
-        """Test nominal energy (488.4 Wh), 80% usable (390.72 Wh), and 20% reserve (97.68 Wh)."""
-        assert math.isclose(BATTERY_SPECS.nominal_energy_wh, 488.4, rel_tol=1e-4)
-        assert math.isclose(BATTERY_SPECS.usable_energy_wh, 390.72, rel_tol=1e-4)
-        assert math.isclose(BATTERY_SPECS.reserve_energy_wh, 97.68, rel_tol=1e-4)
+        """Test nominal energy (501.6 Wh), 80% usable (401.28 Wh), and 20% reserve (100.32 Wh)."""
+        assert math.isclose(BATTERY_SPECS.nominal_energy_wh, 501.6, rel_tol=1e-4)
+        assert math.isclose(BATTERY_SPECS.usable_energy_wh, 401.28, rel_tol=1e-4)
+        assert math.isclose(BATTERY_SPECS.reserve_energy_wh, 100.32, rel_tol=1e-4)
         assert math.isclose(
             BATTERY_SPECS.usable_energy_wh + BATTERY_SPECS.reserve_energy_wh,
             BATTERY_SPECS.nominal_energy_wh,
@@ -187,7 +190,7 @@ class TestHardwareIntegration:
         """
         integrator = BatterySOCIntegrator(drone_id=0)
 
-        # Case A: 15-minute mission, 180 Wh consumed (within 390.72 Wh usable) -> VALID
+        # Case A: 15-minute mission, 180 Wh consumed (within 401.28 Wh usable) -> VALID
         integrator.energy_consumed_wh = 180.0
         valid, msg = integrator.validate_mission_energy(total_mission_time_sec=15 * 60.0)
         assert valid is True
@@ -198,8 +201,8 @@ class TestHardwareIntegration:
         assert valid is False
         assert "30 minute maximum" in msg
 
-        # Case C: 20-minute mission, but consumed 400 Wh (> 390.72 Wh usable, breached reserve) -> INVALID
-        integrator.energy_consumed_wh = 400.0
+        # Case C: 20-minute mission, but consumed 420 Wh (> 401.28 Wh usable, breached reserve) -> INVALID
+        integrator.energy_consumed_wh = 420.0
         valid, msg = integrator.validate_mission_energy(total_mission_time_sec=20 * 60.0)
         assert valid is False
         assert "reserve breached" in msg
@@ -259,3 +262,54 @@ class TestHardwareIntegration:
         assert net.state.telemetry_streaming_enabled is True
         assert net.state.buffered_messages_count == 0
         assert any(e["event"] == "LINK_RECOVERY" for e in net.state.event_log)
+
+    def test_15_ordered_bom_components_and_lidar_removal(self):
+        """Validate that LiDAR is removed and ordered components (RTK, CAN hub, VTX, SSD, Solid-State Battery) exist."""
+        # 1. LiDAR must be removed
+        assert "lidar" not in HARDWARE_BOM
+        assert not any("lidar" in k.lower() or "lidar" in v.name.lower() for k, v in HARDWARE_BOM.items())
+
+        # 2. RTK GNSS Rover must be present
+        assert "rtk_gnss_rover" in HARDWARE_BOM
+        assert "ZED-F9P" in HARDWARE_BOM["rtk_gnss_rover"].name
+        assert math.isclose(HARDWARE_BOM["rtk_gnss_rover"].mass_kg, 0.041, rel_tol=1e-3)
+
+        # 3. Holybro CAN Hub must be present
+        assert "can_hub" in HARDWARE_BOM
+        assert "Holybro CAN Hub" in HARDWARE_BOM["can_hub"].name
+        assert math.isclose(HARDWARE_BOM["can_hub"].mass_kg, 0.018, rel_tol=1e-3)
+
+        # 4. SpeedyBee TX800 VTX must be present
+        assert "vtx" in HARDWARE_BOM
+        assert "SpeedyBee TX800" in HARDWARE_BOM["vtx"].name
+
+        # 5. Revogreen Solid-State Battery must be present
+        assert "battery" in HARDWARE_BOM
+        assert "Revogreen" in HARDWARE_BOM["battery"].name
+        assert "Solid State" in HARDWARE_BOM["battery"].name
+        assert math.isclose(HARDWARE_BOM["battery"].mass_kg, 1.430, rel_tol=1e-3)
+
+        # 6. Hobbywing X6-SE motors + 2270 props
+        assert "Hobbywing X6-SE" in HARDWARE_BOM["motors"].name
+        assert "2270" in HARDWARE_BOM["propellers"].name
+
+    def test_16_sdf_simulation_world_alignment(self):
+        """Validate that Gazebo SDF file dual_rescue.sdf has LiDAR removed, RTK added, and correct battery visual."""
+        sdf_path = Path(__file__).resolve().parent.parent / "simulation" / "dual" / "dual_rescue.sdf"
+        assert sdf_path.exists(), f"dual_rescue.sdf not found at {sdf_path}"
+
+        sdf_content = sdf_path.read_text(encoding="utf-8")
+
+        # 1. LiDAR links, joints, or sensors must be absent
+        assert "lidar" not in sdf_content.lower()
+
+        # 2. RTK GNSS visual and CORS base station must be present
+        assert "rtk_helix_antenna" in sdf_content
+        assert "rtk_cors_base_station" in sdf_content
+        assert "cors_choke_ring_antenna" in sdf_content
+
+        # 3. Revogreen Solid-State Battery visual must be present
+        assert "revogreen_solid_state_battery" in sdf_content
+
+        # 4. SpeedyBee VTX visual must be present
+        assert "speedybee_tx800" in sdf_content

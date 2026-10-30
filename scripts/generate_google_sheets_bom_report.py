@@ -1154,7 +1154,7 @@ def create_workbook():
     # =============================================================
     # EXPORT STANDALONE CSV FILES (For Direct Google Sheets Import)
     # =============================================================
-    csv_bom_path = "/home/kalpeshbauskar/nidar_rescueswarm/BOM.csv"
+    csv_bom_path = "/home/kalpeshbauskar/nidar_rescueswarm/BOM_detailed_sheets_export.csv"
     with open(csv_bom_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers_bom)

@@ -1,7 +1,7 @@
 """Propulsion, Aerodynamics, Mass Dynamics, Electrical Validation, and Battery/SOC Models.
 
-All propulsion metrics are computed via interpolation of measured T-Motor MN4014 KV330 + 17x5.8
-test bench data rather than hardcoded approximations.
+All propulsion metrics are computed via interpolation of measured Hobbywing X6-SE 280KV + 2270
+folding propeller test bench data rather than hardcoded approximations.
 """
 
 import math
@@ -155,7 +155,7 @@ def validate_electrical_limits(
     details = {
         "motor_current": f"{motor_current:.1f}A <= max tested {MAX_CURRENT_PER_MOTOR_A}A",
         "esc_rating": f"{motor_current:.1f}A <= ESC rated {ELECTRICAL_LIMITS.esc_continuous_current_a}A",
-        "battery_discharge": f"{total_drone_current:.1f}A <= 25C continuous {max_battery_continuous_a}A",
+        "battery_discharge": f"{total_drone_current:.1f}A <= {BATTERY_SPECS.max_continuous_discharge_c}C continuous {max_battery_continuous_a}A",
         "pdb_capacity": f"{total_drone_current:.1f}A <= PDB rated {ELECTRICAL_LIMITS.pdb_continuous_current_a}A",
         "connector_capacity": f"{total_drone_current:.1f}A <= XT90-S rated {ELECTRICAL_LIMITS.connector_continuous_a}A",
         "main_wire_10awg": f"{total_drone_current:.1f}A <= 10 AWG rated {ELECTRICAL_LIMITS.main_wire_10awg_rating_a}A",
@@ -230,8 +230,8 @@ class BatterySOCIntegrator:
     """Integrates dynamic power consumption and tracks battery state of charge (SOC).
 
     Maintains hard separation between:
-    - 80% usable energy (213.12 Wh)
-    - 20% emergency reserve (53.28 Wh)
+    - 80% usable energy (401.28 Wh)
+    - 20% emergency reserve (100.32 Wh)
     """
 
     # Multipliers for flight phase power relative to steady hover

@@ -113,23 +113,24 @@ class DroneVisualState:
         self.nav_state = "INIT"
         self.phase = "WAIT"
 
-        # Hardware & Propulsion Specs (Authoritative Rev-B Heavy-Lift Model)
-        self.auw_kg = 6.28
-        self.dry_mass_kg = 4.68
-        self.tw_ratio = 2.15
-        self.hover_throttle = 0.485
-        self.hover_power_w = 745.0
-        self.current_a = 33.5
-        self.thrust_reserve_pct = 53.5
+        # Hardware & Propulsion Specs (Authoritative Final Ordered BOM: Zenith 22" / Hobbywing X6-SE)
+        self.auw_kg = 6.58
+        self.dry_mass_kg = 5.58
+        self.tw_ratio = 3.65
+        self.hover_throttle = 0.440
+        self.hover_power_w = 675.0
+        self.current_a = 29.6
+        self.thrust_reserve_pct = 72.6
 
-        # Battery Specs (6S LiPo 22.2V 16,000 mAh)
+        # Battery Specs (Revogreen 22.8V 22,000 mAh Solid-State 6S Li-Ion)
         self.battery_soc = 100.0
         self.voltage = 25.2
         self.consumed_wh = 0.0
-        self.usable_wh = 284.2
-        self.nominal_wh = 355.2
+        self.usable_wh = 401.3
+        self.nominal_wh = 501.6
         self.is_reserve_intact = True
-        self.flight_time_min = 18.0
+        self.flight_time_min = 35.7
+        self.rtk_status = "RTK FIX (1cm CEP)"
 
         # Payload Specs (5x 0.20 kg SOLAS Relief Canisters)
         self.packages_remaining = 5
@@ -777,11 +778,11 @@ class RvizTelemetryNode(Node):
                 f"Phase: {drone.phase} [Waypoints: {drone.route_index}/{drone.route_total} ({drone.route_percent:.0f}%)] | Mode: {drone.nav_state}\n"
                 f"Ground Speed: {drone.speed_3d:.2f} m/s (H:{drone.speed_h:.2f} | V:{drone.speed_v:+.2f})\n"
                 f"Altitude AGL: {drone.alt_agl:.2f}m | Yaw: {drone.yaw:.1f}° (R:{drone.roll:+.1f}°, P:{drone.pitch:+.1f}°)\n"
-                f"Dynamics: AUW {drone.auw_kg:.2f} kg | T/W {drone.tw_ratio:.2f}:1 | Power: {drone.hover_power_w:.0f}W ({drone.current_a:.1f}A)\n"
-                f"Battery: {drone.battery_soc:.1f}% ({drone.voltage:.1f}V | {drone.consumed_wh:.1f} Wh used | ~{drone.flight_time_min:.1f} min)\n"
+                f"Dynamics: AUW {drone.auw_kg:.2f} kg | T/W {drone.tw_ratio:.2f}:1 (Hobbywing X6-SE) | Power: {drone.hover_power_w:.0f}W ({drone.current_a:.1f}A)\n"
+                f"Battery: {drone.battery_soc:.1f}% Revogreen Solid-State ({drone.voltage:.1f}V | {drone.consumed_wh:.1f} Wh used | ~{drone.flight_time_min:.1f} min)\n"
                 f"Payload Rack: {drone.packages_remaining}/{drone.packages_total} Canisters Available ({drone.packages_remaining*0.2:.1f} kg cargo)\n"
-                f"GPS Geotag: {lat:.6f}°N, {lon:.6f}°E | Grid: N={drone.pos_n:+.1f}m, E={drone.pos_e:+.1f}m\n"
-                f"Mesh Link: {drone.static_ip} ({drone.wifi_status})"
+                f"RTK GNSS: {lat:.6f}°N, {lon:.6f}°E [RTK FIX: 1cm CEP] | Grid: N={drone.pos_n:+.1f}m, E={drone.pos_e:+.1f}m\n"
+                f"Mesh Link: {drone.static_ip} ({drone.wifi_status}) | VTX: SpeedyBee 5.8GHz"
             )
             markers.markers.append(m_hud)
 

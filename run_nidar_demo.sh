@@ -35,7 +35,7 @@ if (( $(echo "$WIND_SPEED > 0.001" | bc -l) )); then
 else
     echo "Calm weather mode: 0.0 m/s wind (stable, level flight)."
 fi
-echo "Configuration Validated: Rev-B Heavy-Lift High-Speed (850mm)."
+echo "Configuration Validated: Final Ordered BOM (Zenith 22-Inch / Hobbywing X6-SE / Revogreen Solid-State)."
 
 echo "Launching Gazebo GUI..."
 gz sim -r --render-engine ogre dual_rescue.sdf &
@@ -108,7 +108,7 @@ mkdir -p "$PROJECT_ROOT/simulation/logs"
 ros2 launch nidar_vision vision_fleet.launch.py detector:="$DETECTOR" > "$PROJECT_ROOT/simulation/logs/vision.log" 2>&1 &
 VISION_PID=$!
 
-echo "Starting RViz2 Tactical Swarm Ground Station (LiDAR, Cameras, Speeds, Geotags, Deliveries)..."
+echo "Starting RViz2 Tactical Swarm Ground Station (RTK GNSS, Cameras, Speeds, Geotags, Deliveries)..."
 ros2 launch nidar_vision vision_rviz.launch.py > "$PROJECT_ROOT/simulation/logs/rviz.log" 2>&1 &
 RVIZ_PID=$!
 sleep 2

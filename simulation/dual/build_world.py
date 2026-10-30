@@ -39,20 +39,21 @@ drone_specs = profile.get("drones", [
 
 PKG_MASS = cfg.get("package_mass_kg", PACKAGE_MASS_KG)
 
-# Rev-B XL airframe: 1,050 mm motor-to-motor diagonal for 23in (585 mm) A6-M props,
-# giving 157 mm tip-to-tip clearance and keeping the inner prop tip clear of the canopy.
-WHEELBASE_M = 1.050
-ROTOR_XY = round(WHEELBASE_M / 2 / math.sqrt(2), 4)   # 0.3712 m in X and Y
-ARM_RADIUS_M = WHEELBASE_M / 2                          # 0.525 m centre to motor
-PROP_DIAMETER_M = 0.585
-ARM_MASS_KG = 0.396                                     # 4x 430 mm arm tubes, part of HARDWARE_BOM["frame"]
+# Zenith Unmanned Systems Heavy-Lift Airframe for 22-Inch (558.8 mm) Folding Props:
+# Wheelbase: 980 mm motor-to-motor diagonal, giving 134 mm adjacent tip clearance
+# and keeping the inner prop tip comfortably clear of the central avionics canopy.
+WHEELBASE_M = 0.980
+ROTOR_XY = round(WHEELBASE_M / 2 / math.sqrt(2), 4)   # 0.3465 m in X and Y
+ARM_RADIUS_M = WHEELBASE_M / 2                          # 0.490 m centre to motor
+PROP_DIAMETER_M = 0.5588                                # 22.0 inches (Hobbywing 2270)
+ARM_MASS_KG = 0.360                                     # 4x 25mm CF arm tubes
 
 # MulticopterMotorModel: thrust = motorConstant * omega^2, calibrated so 1000 rad/s gives
-# the A6-M 6.0 kgf peak (24 kgf total). Larger 23in rotors spin up slower than the old 13in.
+# the Hobbywing X6-SE 6.0 kgf peak (24 kgf total).
 MAX_ROT_VELOCITY = 1000.0
 MOTOR_CONSTANT = MAX_THRUST_PER_MOTOR_KGF * 9.80665 / MAX_ROT_VELOCITY**2
-MOTOR_TIME_CONSTANT_UP = 0.025
-MOTOR_TIME_CONSTANT_DOWN = 0.050
+MOTOR_TIME_CONSTANT_UP = 0.020
+MOTOR_TIME_CONSTANT_DOWN = 0.040
 
 # Arducam IMX477 HQ with 6 mm CS lens: 63 deg horizontal FOV (30.6 m swath at 25 m vs 20 m lanes)
 CAM_HFOV_RAD = round(math.radians(63.0), 4)
@@ -179,10 +180,10 @@ for d_spec in drone_specs:
         else HARDWARE_BOM["payload_drop_rack_2slot"].mass_kg
     )
     cam_mass = HARDWARE_BOM["camera"].mass_kg
-    lidar_mass = HARDWARE_BOM["lidar"].mass_kg
     rotor_mass = HARDWARE_BOM["propellers"].mass_kg / 4.0
-    # Every link's mass comes out of dry_mass so the SDF total equals the hardware config
-    base_mass = round(dry_mass - (rack_mass + cam_mass + lidar_mass + 4 * rotor_mass), 4)
+    # Every link's mass comes out of dry_mass so the SDF total equals the hardware config.
+    # Note: LiDAR is removed from the ordered BOM; base_mass absorbs frame, avionics, battery, RTK.
+    base_mass = round(dry_mass - (rack_mass + cam_mass + 4 * rotor_mass), 4)
 
     # base_link inertia: motors+ESCs as point masses at the arm tips, arms as rods
     # from 0.10 m to the motor, everything else as the 0.38 x 0.34 x 0.12 m core box
@@ -266,29 +267,72 @@ for d_spec in drone_specs:
     sub(mat, "ambient", "1.0 1.0 1.0 1")
     sub(mat, "diffuse", "1.0 1.0 1.0 1")
 
-    # 5. RTK GNSS Antenna Mast & Dome (Total height 0.18 m above chassis)
+    # 4b. Revogreen 22.8V 22000mAh Solid-State 6S Battery Pack (170 x 70 x 70 mm)
+    batt_vis = E.SubElement(base_link, "visual", name="revogreen_solid_state_battery")
+    sub(batt_vis, "pose", "-0.01 0 0.020 0 0 0")
+    g_b = E.SubElement(batt_vis, "geometry")
+    sub(E.SubElement(g_b, "box"), "size", "0.170 0.070 0.070")
+    m_b = E.SubElement(batt_vis, "material")
+    sub(m_b, "ambient", "0.10 0.45 0.20 1")  # Revogreen Green
+    sub(m_b, "diffuse", "0.15 0.60 0.25 1")
+    sub(m_b, "specular", "0.6 0.6 0.6 1")
+
+    # 4c. SpeedyBee TX800 5.8GHz Video Transmitter & MMCX Antenna
+    vtx_box = E.SubElement(base_link, "visual", name="speedybee_tx800")
+    sub(vtx_box, "pose", "0.08 0 0.092 0 0 0")
+    g_vtx = E.SubElement(vtx_box, "geometry")
+    sub(E.SubElement(g_vtx, "box"), "size", "0.028 0.028 0.012")
+    m_vtx = E.SubElement(vtx_box, "material")
+    sub(m_vtx, "ambient", "0.90 0.75 0.10 1")
+    sub(m_vtx, "diffuse", "0.95 0.80 0.15 1")
+
+    vtx_ant = E.SubElement(base_link, "visual", name="speedybee_antenna")
+    sub(vtx_ant, "pose", "0.08 0 0.115 0 0 0")
+    g_va = E.SubElement(vtx_ant, "geometry")
+    cyl_va = E.SubElement(g_va, "cylinder")
+    sub(cyl_va, "radius", "0.003")
+    sub(cyl_va, "length", "0.035")
+    m_va = E.SubElement(vtx_ant, "material")
+    sub(m_va, "ambient", "0.15 0.15 0.18 1")
+    sub(m_va, "diffuse", "0.20 0.20 0.25 1")
+
+    # 5. GenX High-Gain RTK GNSS Rover Helix Antenna (LH-105A2-B Multi-Band L1+L2+L5)
+    # Total mast height 0.12 m above chassis, helical antenna diameter 28mm x 58.5mm
     mast = E.SubElement(base_link, "visual", name="rtk_mast")
-    sub(mast, "pose", "-0.08 0 0.125 0 0 0")
+    sub(mast, "pose", "-0.08 0 0.100 0 0 0")
     g = E.SubElement(mast, "geometry")
     cyl = E.SubElement(g, "cylinder")
-    sub(cyl, "radius", "0.008")
-    sub(cyl, "length", "0.090")
+    sub(cyl, "radius", "0.006")
+    sub(cyl, "length", "0.070")
     mat = E.SubElement(mast, "material")
-    sub(mat, "ambient", "0.85 0.85 0.90 1")
-    sub(mat, "diffuse", "0.95 0.95 1.0 1")
+    sub(mat, "ambient", "0.20 0.20 0.24 1")
+    sub(mat, "diffuse", "0.25 0.25 0.30 1")
 
-    dome = E.SubElement(base_link, "visual", name="rtk_antenna_dome")
-    sub(dome, "pose", "-0.08 0 0.175 0 0 0")
-    g = E.SubElement(dome, "geometry")
-    cyl = E.SubElement(g, "cylinder")
-    sub(cyl, "radius", "0.040")
-    sub(cyl, "length", "0.018")
-    mat = E.SubElement(dome, "material")
-    sub(mat, "ambient", "0.95 0.95 0.98 1")
-    sub(mat, "diffuse", "1.0 1.0 1.0 1")
-    sub(mat, "specular", "0.8 0.8 0.8 1")
+    # Gold/brass SMA-J connector collar
+    sma_collar = E.SubElement(base_link, "visual", name="rtk_sma_collar")
+    sub(sma_collar, "pose", "-0.08 0 0.138 0 0 0")
+    g_sma = E.SubElement(sma_collar, "geometry")
+    cyl_sma = E.SubElement(g_sma, "cylinder")
+    sub(cyl_sma, "radius", "0.008")
+    sub(cyl_sma, "length", "0.012")
+    mat_sma = E.SubElement(sma_collar, "material")
+    sub(mat_sma, "ambient", "0.90 0.75 0.20 1")
+    sub(mat_sma, "diffuse", "0.95 0.80 0.25 1")
+    sub(mat_sma, "specular", "0.9 0.9 0.9 1")
 
-    # 6. Heavy-Duty 1,050mm Carbon-Fiber Arms (42mm x 32mm structural carbon tubes)
+    # Helical antenna cylindrical body (Φ28 mm × 58.5 mm length)
+    helix_body = E.SubElement(base_link, "visual", name="rtk_helix_antenna")
+    sub(helix_body, "pose", "-0.08 0 0.173 0 0 0")
+    g_helix = E.SubElement(helix_body, "geometry")
+    cyl_helix = E.SubElement(g_helix, "cylinder")
+    sub(cyl_helix, "radius", "0.014")
+    sub(cyl_helix, "length", "0.0585")
+    mat_helix = E.SubElement(helix_body, "material")
+    sub(mat_helix, "ambient", "0.15 0.15 0.18 1")
+    sub(mat_helix, "diffuse", "0.22 0.22 0.26 1")
+    sub(mat_helix, "specular", "0.8 0.8 0.8 1")
+
+    # 6. Heavy-Duty Zenith 22-Inch Carbon-Fiber Arms (25mm structural carbon tubes)
     a = ROTOR_XY / 2
     for arm_idx, (ax, ay, yaw) in enumerate([
         (a, -a, -0.7854),
@@ -299,7 +343,7 @@ for d_spec in drone_specs:
         arm_v = E.SubElement(base_link, "visual", name=f"cf_arm_{arm_idx}")
         sub(arm_v, "pose", f"{ax} {ay} 0.025 0 0 {yaw}")
         g = E.SubElement(arm_v, "geometry")
-        sub(E.SubElement(g, "box"), "size", f"{ARM_RADIUS_M + 0.010:.3f} 0.042 0.032")
+        sub(E.SubElement(g, "box"), "size", f"{ARM_RADIUS_M + 0.010:.3f} 0.038 0.028")
         mat = E.SubElement(arm_v, "material")
         sub(mat, "ambient", "0.26 0.26 0.30 1")
         sub(mat, "diffuse", "0.34 0.34 0.38 1")
@@ -316,31 +360,31 @@ for d_spec in drone_specs:
         sleeve = E.SubElement(base_link, "visual", name=f"arm_safety_sleeve_{s_idx}")
         sub(sleeve, "pose", f"{sx} {sy} 0.025 0 0 {syaw}")
         g = E.SubElement(sleeve, "geometry")
-        sub(E.SubElement(g, "box"), "size", "0.080 0.046 0.036")
+        sub(E.SubElement(g, "box"), "size", "0.080 0.042 0.032")
         mat = E.SubElement(sleeve, "material")
         sub(mat, "ambient", s_color)
         sub(mat, "diffuse", s_color)
 
-    # 8. A6-M Motor Nacelles (integrated FOC ESC) & Bells at (±ROTOR_XY, ±ROTOR_XY)
+    # 8. Hobbywing X6-SE 280KV Motor Pods (integrated FOC ESC) & Bells at (±ROTOR_XY, ±ROTOR_XY)
     rxy = ROTOR_XY
     for m_idx, (mx, my) in enumerate([(rxy, -rxy), (-rxy, rxy), (rxy, rxy), (-rxy, -rxy)]):
         mpod = E.SubElement(base_link, "visual", name=f"heavy_motor_pod_{m_idx}")
-        sub(mpod, "pose", f"{mx} {my} 0.035 0 0 0")
+        sub(mpod, "pose", f"{mx} {my} 0.032 0 0 0")
         g = E.SubElement(mpod, "geometry")
         cyl = E.SubElement(g, "cylinder")
-        sub(cyl, "radius", "0.040")
-        sub(cyl, "length", "0.048")
+        sub(cyl, "radius", "0.038")
+        sub(cyl, "length", "0.045")
         mat = E.SubElement(mpod, "material")
-        sub(mat, "ambient", "0.45 0.45 0.50 1")
-        sub(mat, "diffuse", "0.58 0.58 0.64 1")
+        sub(mat, "ambient", "0.40 0.40 0.45 1")
+        sub(mat, "diffuse", "0.50 0.50 0.55 1")
         sub(mat, "specular", "0.8 0.8 0.8 1")
 
         mbell = E.SubElement(base_link, "visual", name=f"motor_bell_{m_idx}")
-        sub(mbell, "pose", f"{mx} {my} 0.056 0 0 0")
+        sub(mbell, "pose", f"{mx} {my} 0.052 0 0 0")
         g_bell = E.SubElement(mbell, "geometry")
         cyl_b = E.SubElement(g_bell, "cylinder")
-        sub(cyl_b, "radius", "0.038")
-        sub(cyl_b, "length", "0.016")
+        sub(cyl_b, "radius", "0.036")
+        sub(cyl_b, "length", "0.015")
         mat_b = E.SubElement(mbell, "material")
         sub(mat_b, "ambient", "0.75 0.75 0.80 1")
         sub(mat_b, "diffuse", "0.85 0.85 0.90 1")
@@ -532,7 +576,7 @@ for d_spec in drone_specs:
             if el is not None:
                 el.text = val
 
-    # Set 1,050mm wheelbase (ROTOR_XY in X/Y) for 157mm tip clearance with 23in props
+    # Set 980mm Zenith wheelbase (ROTOR_XY in X/Y) for 134mm tip clearance with 22in props
     for i_rotor in range(4):
         rl = m.find(f"link[@name='rotor_{i_rotor}']")
         if rl is not None:
@@ -695,70 +739,36 @@ for d_spec in drone_specs:
         else:
             hfov.text = str(CAM_HFOV_RAD)
 
-    # 13b. 360-Degree High-Rate 3D Scanning LiDAR Sensor Link & Joint
-    lidar_link = m.find("link[@name='lidar_link']")
-    if lidar_link is None:
-        lidar_link = E.SubElement(m, "link", name="lidar_link")
-        sub(lidar_link, "pose", "0 0 0.115 0 0 0")
-        l_inert = E.SubElement(lidar_link, "inertial")
-        sub(l_inert, "mass", lidar_mass)
-        l_iner = E.SubElement(l_inert, "inertia")
-        for ax in ["ixx", "iyy", "izz"]:
-            sub(l_iner, ax, "0.0001")
-        for ax in ["ixy", "ixz", "iyz"]:
-            sub(l_iner, ax, "0.0")
+    # 13b. High-Precision GenX Ublox ZED-F9P RTK GNSS Sensor Configuration
+    # Configures RTK Fix centimeter-grade positioning (1cm horizontal CEP)
+    navsat = base_link.find("sensor[@name='navsat_sensor']")
+    if navsat is not None:
+        navsat.find("update_rate").text = "20"
+        pos_sense = navsat.find("position_sensing")
+        if pos_sense is None:
+            pos_sense = E.SubElement(navsat, "position_sensing")
+        horiz_sense = pos_sense.find("horizontal")
+        if horiz_sense is None:
+            horiz_sense = E.SubElement(pos_sense, "horizontal")
+        h_noise = horiz_sense.find("noise")
+        if h_noise is None:
+            h_noise = E.SubElement(horiz_sense, "noise", type="gaussian")
+            sub(h_noise, "mean", "0.0")
+            sub(h_noise, "stddev", "0.01")  # 1 cm RTK precision
+        vert_sense = pos_sense.find("vertical")
+        if vert_sense is None:
+            vert_sense = E.SubElement(pos_sense, "vertical")
+        v_noise = vert_sense.find("noise")
+        if v_noise is None:
+            v_noise = E.SubElement(vert_sense, "noise", type="gaussian")
+            sub(v_noise, "mean", "0.0")
+            sub(v_noise, "stddev", "0.02")
 
-        l_vis = E.SubElement(lidar_link, "visual", name="lidar_puck_visual")
-        sub(l_vis, "pose", "0 0 0 0 0 0")
-        lg = E.SubElement(l_vis, "geometry")
-        lcyl = E.SubElement(lg, "cylinder")
-        sub(lcyl, "radius", "0.038")
-        sub(lcyl, "length", "0.032")
-        lmat = E.SubElement(l_vis, "material")
-        sub(lmat, "ambient", "0.15 0.15 0.18 1")
-        sub(lmat, "diffuse", "0.25 0.25 0.30 1")
-        sub(lmat, "specular", "0.9 0.9 0.9 1")
-
-        l_ring = E.SubElement(lidar_link, "visual", name="lidar_blue_ring")
-        sub(l_ring, "pose", "0 0 0.005 0 0 0")
-        lrg = E.SubElement(l_ring, "geometry")
-        lrcyl = E.SubElement(lrg, "cylinder")
-        sub(lrcyl, "radius", "0.040")
-        sub(lrcyl, "length", "0.006")
-        lrmat = E.SubElement(l_ring, "material")
-        sub(lrmat, "ambient", "0.0 0.7 1.0 1")
-        sub(lrmat, "diffuse", "0.0 0.8 1.0 1")
-        sub(lrmat, "emissive", "0.0 0.5 0.9 1")
-
-        sensor = E.SubElement(lidar_link, "sensor", name=f"lidar_{i}", type="gpu_lidar")
-        sub(sensor, "pose", "0 0 0 0 0 0")
-        sub(sensor, "topic", f"/rescue_{i}/scan")
-        sub(sensor, "update_rate", "20")
-        sub(sensor, "gz_frame_id", f"rescue_{i}/lidar_link")
-        sub(sensor, "frame_id", f"rescue_{i}/lidar_link")
-        sub(sensor, "ign_frame_id", f"rescue_{i}/lidar_link")
-        ray = E.SubElement(sensor, "ray")
-        scan = E.SubElement(ray, "scan")
-        horiz = E.SubElement(scan, "horizontal")
-        sub(horiz, "samples", "360")
-        sub(horiz, "resolution", "1")
-        sub(horiz, "min_angle", "-3.14159")
-        sub(horiz, "max_angle", "3.14159")
-        vert = E.SubElement(scan, "vertical")
-        sub(vert, "samples", "16")
-        sub(vert, "resolution", "1")
-        sub(vert, "min_angle", "-0.2618")
-        sub(vert, "max_angle", "0.2618")
-        rng = E.SubElement(ray, "range")
-        sub(rng, "min", "0.15")
-        sub(rng, "max", "50.0")
-        sub(rng, "resolution", "0.01")
-        sub(sensor, "always_on", "1")
-        sub(sensor, "visualize", "true")
-
-        lidar_joint = E.SubElement(m, "joint", name="lidar_joint", type="fixed")
-        sub(lidar_joint, "parent", "base_link")
-        sub(lidar_joint, "child", "lidar_link")
+    # Remove any residual LiDAR links or joints (LiDAR is removed from final ordered BOM)
+    for lidar_tag, lidar_item in [("link", "lidar_link"), ("joint", "lidar_joint")]:
+        old_lidar = m.find(f"{lidar_tag}[@name='{lidar_item}']")
+        if old_lidar is not None:
+            m.remove(old_lidar)
 
     # 14. Emergency Medical / Humanitarian Survival Canisters (High-Visibility 5-Canister Array)
     if pkg_count == 5:
@@ -933,33 +943,33 @@ for d_spec in drone_specs:
         "param set-default MPC_TKO_RAMP_T 2.0\n"
         "param set-default MPC_TKO_SPEED 2.5\n"
         "param set MPC_TKO_SPEED 2.5\n"
-        "param set-default MPC_XY_CRUISE 10.0\n"
-        "param set MPC_XY_CRUISE 10.0\n"
-        "param set-default MPC_XY_VEL_MAX 12.0\n"
-        "param set MPC_XY_VEL_MAX 12.0\n"
-        "param set-default MPC_ACC_HOR 4.5\n"
-        "param set MPC_ACC_HOR 4.5\n"
-        "param set-default MPC_ACC_HOR_MAX 5.0\n"
-        "param set MPC_ACC_HOR_MAX 5.0\n"
-        "param set-default MPC_Z_V_AUTO_UP 3.5\n"
-        "param set MPC_Z_V_AUTO_UP 3.5\n"
-        "param set-default MPC_Z_VEL_MAX_UP 4.0\n"
-        "param set MPC_Z_VEL_MAX_UP 4.0\n"
-        "param set-default MPC_Z_V_AUTO_DN 2.8\n"
-        "param set MPC_Z_V_AUTO_DN 2.8\n"
-        "param set-default MPC_Z_VEL_MAX_DN 3.0\n"
-        "param set MPC_Z_VEL_MAX_DN 3.0\n"
-        "param set-default MPC_ACC_UP_MAX 5.0\n"
-        "param set MPC_ACC_UP_MAX 5.0\n"
-        "param set-default MPC_ACC_DOWN_MAX 4.0\n"
-        "param set MPC_ACC_DOWN_MAX 4.0\n"
+        "param set-default MPC_XY_CRUISE 12.0\n"
+        "param set MPC_XY_CRUISE 12.0\n"
+        "param set-default MPC_XY_VEL_MAX 14.0\n"
+        "param set MPC_XY_VEL_MAX 14.0\n"
+        "param set-default MPC_ACC_HOR 5.0\n"
+        "param set MPC_ACC_HOR 5.0\n"
+        "param set-default MPC_ACC_HOR_MAX 6.0\n"
+        "param set MPC_ACC_HOR_MAX 6.0\n"
+        "param set-default MPC_Z_V_AUTO_UP 4.0\n"
+        "param set MPC_Z_V_AUTO_UP 4.0\n"
+        "param set-default MPC_Z_VEL_MAX_UP 4.5\n"
+        "param set MPC_Z_VEL_MAX_UP 4.5\n"
+        "param set-default MPC_Z_V_AUTO_DN 3.2\n"
+        "param set MPC_Z_V_AUTO_DN 3.2\n"
+        "param set-default MPC_Z_VEL_MAX_DN 3.6\n"
+        "param set MPC_Z_VEL_MAX_DN 3.6\n"
+        "param set-default MPC_ACC_UP_MAX 5.5\n"
+        "param set MPC_ACC_UP_MAX 5.5\n"
+        "param set-default MPC_ACC_DOWN_MAX 4.5\n"
+        "param set MPC_ACC_DOWN_MAX 4.5\n"
         "param set-default MPC_LAND_ALT1 2.5\n"
         "param set MPC_LAND_ALT1 2.5\n"
         "param set-default MPC_LAND_ALT2 1.0\n"
         "param set MPC_LAND_ALT2 1.0\n"
         "param set-default MPC_LAND_SPEED 1.2\n"
         "param set MPC_LAND_SPEED 1.2\n"
-        "\n# Control allocation geometry for the 1,050mm wheelbase (FRD body frame)\n"
+        "\n# Control allocation geometry for the 980mm Zenith wheelbase (FRD body frame)\n"
         f"param set-default CA_ROTOR0_PX {ROTOR_XY}\n"
         f"param set-default CA_ROTOR0_PY {ROTOR_XY}\n"
         f"param set-default CA_ROTOR1_PX {-ROTOR_XY}\n"
@@ -970,6 +980,58 @@ for d_spec in drone_specs:
         f"param set-default CA_ROTOR3_PY {ROTOR_XY}\n"
     )
     af.write_text(text)
+
+# Ground RTK Survey Grade CORS Base Station Antenna (RoboKits LS-125-A) on launch pad
+rtk_base_station = E.SubElement(w, "model", name="rtk_cors_base_station")
+sub(rtk_base_station, "pose", "0 -10 0 0 0 0")
+sub(rtk_base_station, "static", "true")
+base_st_link = E.SubElement(rtk_base_station, "link", name="base_station_link")
+
+# Survey Tripod (3 yellow tubular legs)
+for tr_idx, (tx, ty, t_pitch, t_yaw) in enumerate([
+    (0.0, -0.35, -0.25, 0.0),
+    (0.30, 0.20, 0.15, 2.094),
+    (-0.30, 0.20, 0.15, -2.094),
+]):
+    leg = E.SubElement(base_st_link, "visual", name=f"tripod_leg_{tr_idx}")
+    sub(leg, "pose", f"{tx} {ty} 0.70 {t_pitch} 0 {t_yaw}")
+    lg = E.SubElement(leg, "geometry")
+    cyl_l = E.SubElement(lg, "cylinder")
+    sub(cyl_l, "radius", "0.018")
+    sub(cyl_l, "length", "1.45")
+    mat_l = E.SubElement(leg, "material")
+    sub(mat_l, "ambient", "1.0 0.80 0.0 1")  # Safety Survey Yellow
+    sub(mat_l, "diffuse", "1.0 0.85 0.0 1")
+
+# Tripod center column and tribrach mount
+tribrach = E.SubElement(base_st_link, "visual", name="tribrach_mount")
+sub(tribrach, "pose", "0 0 1.40 0 0 0")
+tb_g = E.SubElement(tribrach, "geometry")
+sub(E.SubElement(tb_g, "box"), "size", "0.15 0.15 0.08")
+tb_m = E.SubElement(tribrach, "material")
+sub(tb_m, "ambient", "0.25 0.25 0.28 1")
+sub(tb_m, "diffuse", "0.35 0.35 0.40 1")
+
+# Survey-Grade CORS Choke-Ring Antenna (LS-125-A) - 150mm dia flying-saucer disk
+cors_ant = E.SubElement(base_st_link, "visual", name="cors_choke_ring_antenna")
+sub(cors_ant, "pose", "0 0 1.48 0 0 0")
+ca_g = E.SubElement(cors_ant, "geometry")
+cyl_ca = E.SubElement(ca_g, "cylinder")
+sub(cyl_ca, "radius", "0.075")
+sub(cyl_ca, "length", "0.045")
+ca_m = E.SubElement(cors_ant, "material")
+sub(ca_m, "ambient", "0.92 0.92 0.96 1")  # Brilliant Survey White
+sub(ca_m, "diffuse", "1.0 1.0 1.0 1")
+sub(ca_m, "specular", "0.9 0.9 0.9 1")
+
+# Antenna Dome / Radome
+cors_dome = E.SubElement(base_st_link, "visual", name="cors_radome")
+sub(cors_dome, "pose", "0 0 1.51 0 0 0")
+cd_g = E.SubElement(cors_dome, "geometry")
+sub(E.SubElement(cd_g, "sphere"), "radius", "0.055")
+cd_m = E.SubElement(cors_dome, "material")
+sub(cd_m, "ambient", "0.95 0.95 1.0 1")
+sub(cd_m, "diffuse", "1.0 1.0 1.0 1")
 
 # Clean Gazebo person models (no pads, no box overlays)
 
